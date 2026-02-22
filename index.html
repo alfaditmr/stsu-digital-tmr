@@ -119,6 +119,31 @@ function dayNameID(ymd){
   return d.toLocaleDateString("id-ID",{weekday:"long"});
 }
 
+// TERBILANG (ID)
+function terbilangID(n){
+  n = Math.floor(Number(n||0));
+  if(n === 0) return "Nol rupiah";
+
+  const satuan = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+  function toWords(x){
+    x = Math.floor(x);
+    if(x < 12) return satuan[x];
+    if(x < 20) return `${toWords(x-10)} belas`;
+    if(x < 100) return `${toWords(Math.floor(x/10))} puluh${x%10 ? " " + toWords(x%10) : ""}`;
+    if(x < 200) return `seratus${x-100 ? " " + toWords(x-100) : ""}`;
+    if(x < 1000) return `${toWords(Math.floor(x/100))} ratus${x%100 ? " " + toWords(x%100) : ""}`;
+    if(x < 2000) return `seribu${x-1000 ? " " + toWords(x-1000) : ""}`;
+    if(x < 1000000) return `${toWords(Math.floor(x/1000))} ribu${x%1000 ? " " + toWords(x%1000) : ""}`;
+    if(x < 1000000000) return `${toWords(Math.floor(x/1000000))} juta${x%1000000 ? " " + toWords(x%1000000) : ""}`;
+    if(x < 1000000000000) return `${toWords(Math.floor(x/1000000000))} miliar${x%1000000000 ? " " + toWords(x%1000000000) : ""}`;
+    return `${toWords(Math.floor(x/1000000000000))} triliun${x%1000000000000 ? " " + toWords(x%1000000000000) : ""}`;
+  }
+
+  const kal = toWords(n).trim();
+  const cap = kal.charAt(0).toUpperCase() + kal.slice(1);
+  return `${cap} rupiah`;
+}
+
 /* ===================== Storage ===================== */
 const LS={
   get(k,d){ try{const v=localStorage.getItem(k); return v?JSON.parse(v):d;}catch{return d;} },
@@ -329,7 +354,7 @@ function renderBuat(app){
             <div>
               <label>Tanggal Transaksi (wajib)</label>
               <input id="tglTrans" type="date" value="${doc.tanggalTransaksi}">
-              <div class="muted">Dipakai untuk nomor STSU & kalimat penutup.</div>
+              <div class="muted">Dipakai untuk nomor STSU & penutup (Retribusi).</div>
             </div>
           </div>
 
@@ -364,9 +389,10 @@ function renderBuat(app){
           <div class="bd">
             <div class="totbox">
               <div class="totline"><div class="muted">Total</div><b id="sumTotal">${rupiah(doc.total)}</b></div>
+              <div class="totline" style="margin-top:6px"><div class="muted">Terbilang</div><span id="sumTerbilang">${escapeHtml(terbilangID(doc.total))}</span></div>
               ${doc.jenis==="RETRIBUSI" ? `
                 <div class="hr"></div>
-                <div class="muted">Subtotal per section</div>
+                <div class="muted">Subtotal per section (aktif)</div>
                 <div id="sumSections" style="margin-top:6px; display:grid; gap:6px"></div>
               ` : ``}
             </div>
@@ -418,8 +444,8 @@ function renderFormArea(){
                 <input id="nominalL" inputmode="numeric" value="${doc.nominalLainnya||0}" placeholder="0">
               </div>
               <div>
-                <label>Catatan</label>
-                <input value="Penutup otomatis menyebut No. STSU & nominal" disabled>
+                <label>Info</label>
+                <input value="Terbilang selalu ditampilkan di preview" disabled>
               </div>
             </div>
           </div>
@@ -520,7 +546,6 @@ function renderSectionUI(section){
             <b>${escapeHtml(section.title)}</b>
           `}
           <div class="muted">${escapeHtml(section.note||"")}</div>
-          <div class="muted"><b>Subtotal:</b> ${rupiah(subtotal)}</div>
         </div>
         <div class="inline no-print" style="gap:8px">
           ${isCustom ? `<button class="btn small danger" id="delsec_${section.id}">Hapus Section</button>` : ``}
@@ -549,6 +574,12 @@ function renderSectionUI(section){
             ${rows.length===0 ? `<tr><td colspan="3" class="muted">Belum ada item. Klik “Tambah baris”.</td></tr>` : ``}
           </tbody>
         </table>
+
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed #cbd5e1">
+          <b>Subtotal ${escapeHtml(section.title)}</b>
+          <b>${rupiah(subtotal)}</b>
+        </div>
+
         <div class="inline no-print" style="justify-content:flex-end;margin-top:10px">
           <button class="btn small" id="add_${section.id}">+ Tambah baris</button>
         </div>
@@ -577,6 +608,7 @@ function refreshTotals(){
   const doc=window.__DOC__;
   doc.total = computeTotal(doc);
   if(el("sumTotal")) el("sumTotal").textContent = rupiah(doc.total);
+  if(el("sumTerbilang")) el("sumTerbilang").textContent = terbilangID(doc.total);
 
   if(doc.jenis==="RETRIBUSI" && el("sumSections")){
     el("sumSections").innerHTML = doc.sections
@@ -671,7 +703,7 @@ function renderPreview(app){
 
   const total=doc.total||0;
 
-  // Penutup sesuai foto (Retribusi)
+  // Penutup Retribusi sesuai foto: hari + tanggal transaksi + No STSU + nominal
   const penutupRetribusi = `
     Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR
     pada hari ${escapeHtml(dayNameID(doc.tanggalTransaksi))} tanggal ${escapeHtml(ymdToIndo(doc.tanggalTransaksi))}
@@ -680,7 +712,7 @@ function renderPreview(app){
 
   app.innerHTML=`
     <div class="no-print inline" style="justify-content:space-between">
-      <div class="muted">Preview Surat A4 • Menampilkan subtotal per section</div>
+      <div class="muted">Preview Surat A4 • Subtotal per section di bawah</div>
       <div class="inline">
         <button class="btn" onclick="go('dashboard')">Kembali</button>
         <button class="btn" onclick="editDoc('${doc.id}')">Edit</button>
@@ -695,15 +727,29 @@ function renderPreview(app){
 
         ${doc.jenis==="LAINNYA" ? `
           <div class="p">${escapeHtml(doc.uraian||"")}</div>
-          <div class="p"><b>${rupiah(doc.nominalLainnya||0)}</b></div>
-        ` : `
-          ${renderSuratSectionsWithSubtotal(doc)}
+
           <div class="total">
             <div style="display:flex;justify-content:space-between;gap:10px;font-size:13px">
               <b>JUMLAH TOTAL</b>
               <b>${rupiah(total)}</b>
             </div>
+            <div class="p" style="margin:8px 0 0;font-size:13px">
+              <b>Terbilang :</b> ${escapeHtml(terbilangID(total))}
+            </div>
           </div>
+        ` : `
+          ${renderSuratSectionsWithSubtotal(doc)}
+
+          <div class="total">
+            <div style="display:flex;justify-content:space-between;gap:10px;font-size:13px">
+              <b>JUMLAH TOTAL</b>
+              <b>${rupiah(total)}</b>
+            </div>
+            <div class="p" style="margin:8px 0 0;font-size:13px">
+              <b>Terbilang :</b> ${escapeHtml(terbilangID(total))}
+            </div>
+          </div>
+
           <div class="p" style="margin-top:10px">${escapeHtml(penutupRetribusi)}</div>
         `}
 
@@ -742,8 +788,8 @@ function renderSuratSectionsWithSubtotal(doc){
     parts.push(`
       <div class="p" style="margin-bottom:6px">
         <b>${escapeHtml(s.title)}</b>
-        <span style="float:right"><b>Subtotal:</b> ${rupiah(sub)}</span>
       </div>
+
       <table class="tabel">
         ${rows.map(it=>`
           <tr>
@@ -752,6 +798,10 @@ function renderSuratSectionsWithSubtotal(doc){
           </tr>
         `).join("")}
       </table>
+
+      <div class="p" style="margin:8px 0 12px">
+        <b>Subtotal ${escapeHtml(s.title)}</b> ----- <b>${rupiah(sub)}</b>
+      </div>
     `);
   });
   return parts.join("");
