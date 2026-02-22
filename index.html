@@ -89,19 +89,13 @@
     }
 
     /* Baris subtotal: angka lebih kanan & bold */
-    .surat .subline{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      margin:6px 0 10px;
-      font-size:12.6px;
-    }
-    .surat .subline .left{font-weight:800}
-    .surat .subline .right{
-      font-weight:900;
-      padding-right:0px; /* subtotal tetap dekat kanan */
-      font-variant-numeric:tabular-nums;
-    }
+  .surat .subline{
+  text-align:right;              /* ✅ semua rata kanan */
+  margin:6px 0 10px;
+  font-size:12.6px;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
 
     .surat .total{border-top:1px solid #0f172a;margin-top:12px;padding-top:10px}
     .surat .ttdgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:22px}
@@ -948,6 +942,7 @@ render();
 </script>
 </body>
 </html>
+
 
 
 
