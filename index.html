@@ -69,12 +69,40 @@
       .section{border:1px solid #cbd5e1}
     }
     @page{size:A4;margin:20mm}
+
+    /* ===== Surat Preview (A4) ===== */
     .surat h1{text-align:center;font-size:15px;letter-spacing:.6px;margin:0}
     .surat .nomor{text-align:center;margin-top:6px;font-size:13px}
-    .surat .p{font-size:13px;line-height:1.55;margin:12px 0}
+
+    /* Rapatkan supaya hemat halaman */
+    .surat .p{font-size:12.6px;line-height:1.38;margin:8px 0}
+
+    /* Tabel lebih rapat */
     .surat .tabel{width:100%;border-collapse:collapse;margin-top:6px}
-    .surat .tabel td{border-top:1px solid #cbd5e1;padding:7px 8px;font-size:13px}
-    .surat .tabel td.r{text-align:right;font-variant-numeric:tabular-nums}
+    .surat .tabel td{border-top:1px solid #cbd5e1;padding:5px 8px;font-size:12.6px}
+
+    /* Angka item dibuat lebih kiri (geser dari kanan) */
+    .surat .tabel td.r{
+      text-align:right;
+      font-variant-numeric:tabular-nums;
+      padding-right:46px; /* item angka lebih kiri */
+    }
+
+    /* Baris subtotal: angka lebih kanan & bold */
+    .surat .subline{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      margin:6px 0 10px;
+      font-size:12.6px;
+    }
+    .surat .subline .left{font-weight:800}
+    .surat .subline .right{
+      font-weight:900;
+      padding-right:8px; /* subtotal tetap dekat kanan */
+      font-variant-numeric:tabular-nums;
+    }
+
     .surat .total{border-top:1px solid #0f172a;margin-top:12px;padding-top:10px}
     .surat .ttdgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:22px}
     .surat .ttd{text-align:center;font-size:13px}
@@ -467,7 +495,7 @@ function renderFormArea(){
       <div class="muted">Section bisa ditambah custom (mis: Retribusi Juru Foto, Retribusi Foto, dll).</div>
       <button class="btn small primary" onclick="addCustomSection()">+ Tambah Section</button>
     </div>
-    ${doc.sections.map((s,idx)=>renderSectionUI(s,idx)).join("")}
+    ${doc.sections.map((s)=>renderSectionUI(s)).join("")}
   `;
 
   // wire handlers
@@ -592,14 +620,19 @@ function addCustomSection(){
   const doc=window.__DOC__;
   const mode = prompt("Tambah Section Custom:\nKetik 1 = Kosong\nKetik 2 = Copy template e-ticketing", "1");
   const items = (mode==="2") ? makeTemplateItems() : [];
-  doc.sections.push({
+  // custom dimasukkan setelah fasilitas, agar terlihat di atas e-ticketing di form juga
+  const idxF = doc.sections.findIndex(s => (s.key||"")==="fasilitas");
+  const newSec = {
     id: crypto.randomUUID(),
     key: "custom",
     title: "Section Baru (ubah nama)",
     note: "custom (bisa juru foto / foto / dll)",
     enabled: true,
     items
-  });
+  };
+  if(idxF>=0) doc.sections.splice(idxF+1, 0, newSec);
+  else doc.sections.unshift(newSec);
+
   renderFormArea();
   refreshTotals();
 }
@@ -712,7 +745,7 @@ function renderPreview(app){
 
   app.innerHTML=`
     <div class="no-print inline" style="justify-content:space-between">
-      <div class="muted">Preview Surat A4 • Subtotal per section di bawah</div>
+      <div class="muted">Preview Surat A4 • Target maksimal 2 halaman</div>
       <div class="inline">
         <button class="btn" onclick="go('dashboard')">Kembali</button>
         <button class="btn" onclick="editDoc('${doc.id}')">Edit</button>
@@ -733,7 +766,7 @@ function renderPreview(app){
               <b>JUMLAH TOTAL</b>
               <b>${rupiah(total)}</b>
             </div>
-            <div class="p" style="margin:8px 0 0;font-size:13px">
+            <div class="p" style="margin:8px 0 0;font-size:12.6px">
               <b>Terbilang :</b> ${escapeHtml(terbilangID(total))}
             </div>
           </div>
@@ -745,12 +778,12 @@ function renderPreview(app){
               <b>JUMLAH TOTAL</b>
               <b>${rupiah(total)}</b>
             </div>
-            <div class="p" style="margin:8px 0 0;font-size:13px">
+            <div class="p" style="margin:8px 0 0;font-size:12.6px">
               <b>Terbilang :</b> ${escapeHtml(terbilangID(total))}
             </div>
           </div>
 
-          <div class="p" style="margin-top:10px">${escapeHtml(penutupRetribusi)}</div>
+          <div class="p" style="margin-top:18px">${escapeHtml(penutupRetribusi)}</div>
         `}
 
         <div class="p" style="text-align:right;margin-top:12px">
@@ -775,9 +808,29 @@ function renderPreview(app){
 }
 
 function renderSuratSectionsWithSubtotal(doc){
+  // Urutan: fasilitas -> custom -> eticket -> online -> vending -> newgate -> susulan -> lainnya
+  const orderRank = (s)=>{
+    const k = (s.key||"").toLowerCase();
+    if(k==="fasilitas") return 10;
+    if(k==="custom") return 20;
+    if(k==="eticket") return 30;
+    if(k==="online") return 40;
+    if(k==="vending") return 50;
+    if(k==="newgate") return 60;
+    if(k==="susulan") return 70;
+    return 999;
+  };
+
+  const sections = [...(doc.sections||[])].sort((a,b)=>{
+    const ra=orderRank(a), rb=orderRank(b);
+    if(ra!==rb) return ra-rb;
+    return (doc.sections||[]).indexOf(a) - (doc.sections||[]).indexOf(b);
+  });
+
   const parts=[];
-  (doc.sections||[]).forEach(s=>{
+  sections.forEach(s=>{
     if(!s.enabled) return;
+
     const rows=(s.items||[])
       .filter(it=>Number(it.nominal||0)!==0)
       .filter(it=>(it.kategori||"").trim()!=="");
@@ -786,7 +839,7 @@ function renderSuratSectionsWithSubtotal(doc){
     const sub = sum(rows.map(it=>Number(it.nominal||0)));
 
     parts.push(`
-      <div class="p" style="margin-bottom:6px">
+      <div class="p" style="margin-bottom:4px">
         <b>${escapeHtml(s.title)}</b>
       </div>
 
@@ -799,11 +852,13 @@ function renderSuratSectionsWithSubtotal(doc){
         `).join("")}
       </table>
 
-      <div class="p" style="margin:8px 0 12px">
-        <b>Subtotal ${escapeHtml(s.title)}</b> ----- <b>${rupiah(sub)}</b>
+      <div class="subline">
+        <div class="left">Subtotal ${escapeHtml(s.title)} -----</div>
+        <div class="right">${rupiah(sub)}</div>
       </div>
     `);
   });
+
   return parts.join("");
 }
 
