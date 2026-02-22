@@ -91,26 +91,22 @@
       white-space:nowrap;
     }
 
-    /* Subtotal: label+angka sama-sama nempel kanan (anti wrap bertumpuk) */
+    /* ✅ Subtotal 1 baris sejajar: "Subtotal X ----- Rp ...." */
     .surat .subline{
       display:flex;
       justify-content:flex-end;
       align-items:baseline;
-      gap:14px;
+      gap:10px;
       margin:6px 0 10px;
       font-size:12.6px;
+      font-weight:900;
       font-variant-numeric:tabular-nums;
+      white-space:nowrap;  /* ✅ tidak turun baris */
+      overflow:hidden;
     }
-    .surat .subline .left{
-      font-weight:900;
-      white-space:nowrap;
-    }
+    .surat .subline .left,
     .surat .subline .right{
-      font-weight:900;
-      min-width:150px;
-      text-align:right;
       white-space:nowrap;
-      padding-right:0px; /* ✅ subtotal paling kanan */
     }
 
     .surat .total{border-top:1px solid #0f172a;margin-top:12px;padding-top:10px}
@@ -355,8 +351,8 @@ function renderBuat(app){
     doc={
       id:crypto.randomUUID(),
       jenis:"RETRIBUSI",
-      tanggalTransaksi:today,   // WAJIB (untuk nomor)
-      tanggalTTD:"",            // OPSIONAL (untuk Jakarta, ...)
+      tanggalTransaksi:today,
+      tanggalTTD:"",
       status:"DRAFT",
       nomor:"",
       uraian:"",
@@ -830,8 +826,8 @@ function renderSuratSectionsWithSubtotal(doc){
       </table>
 
       <div class="subline">
-        <div class="left">Subtotal ${escapeHtml(s.title)} -----</div>
-        <div class="right">${rupiah(sub)}</div>
+        <span class="left">Subtotal ${escapeHtml(s.title)} -----</span>
+        <span class="right">${rupiah(sub)}</span>
       </div>
     `);
   });
