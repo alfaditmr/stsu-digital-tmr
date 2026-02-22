@@ -6,152 +6,61 @@
   <title>STSU Digital</title>
   <style>
     :root{
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --border:#e2e8f0;
-      --primary:#0f172a;
-      --primary2:#111827;
-      --ok:#16a34a;
-      --warn:#f59e0b;
-      --shadow:0 10px 25px rgba(2,8,23,.08);
-      --radius:16px;
+      --bg:#f6f8fb; --card:#fff; --text:#0f172a; --muted:#64748b;
+      --border:#e2e8f0; --primary:#0f172a; --shadow:0 10px 25px rgba(2,8,23,.08);
+      --radius:16px; --ok:#16a34a; --danger:#b91c1c;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background:var(--bg);
-      color:var(--text);
-    }
-    a{color:inherit}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
     .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    .topbar{
-      position:sticky;top:0;z-index:20;
-      background:rgba(255,255,255,.86);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--border);
-    }
-    .topbar .inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;max-width:1100px;margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .topbar .inner{max-width:1100px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;align-items:center;gap:10px}
-    .logo{
-      width:38px;height:38px;border-radius:12px;background:var(--primary);
-      color:white;display:flex;align-items:center;justify-content:center;font-weight:800;
-    }
-    .brand .title{line-height:1.15}
-    .brand .title b{display:block;font-size:14px}
-    .brand .title span{display:block;font-size:12px;color:var(--muted)}
+    .logo{width:38px;height:38px;border-radius:12px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
+    .title b{display:block;font-size:14px;line-height:1.1}
+    .title span{display:block;font-size:12px;color:var(--muted)}
     .nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{
-      appearance:none;border:1px solid var(--border);
-      background:#fff;color:var(--text);
-      padding:9px 12px;border-radius:12px;
-      font-size:13px;font-weight:600;cursor:pointer;
-      display:inline-flex;align-items:center;gap:8px;
-    }
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;color:var(--text);padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
     .btn:hover{background:#f8fafc}
     .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-    .btn.primary:hover{background:var(--primary2)}
-    .btn.ghost{background:transparent}
-    .btn.danger{border-color:#fecaca;background:#fff;color:#b91c1c}
+    .btn.primary:hover{opacity:.92}
     .btn.small{padding:7px 10px;border-radius:10px;font-size:12px}
-    .grid{
-      display:grid;gap:14px;
-    }
-    .grid.two{grid-template-columns: 1fr}
-    @media (min-width: 900px){
-      .grid.two{grid-template-columns: 1.35fr .65fr}
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
+    .btn.danger{border-color:#fecaca;background:#fff;color:var(--danger)}
+    .grid{display:grid;gap:14px}
+    .grid.two{grid-template-columns:1fr}
+    @media(min-width:900px){.grid.two{grid-template-columns:1.35fr .65fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
     .card .hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .card .hd h2,.card .hd h3{margin:0;font-size:15px}
-    .card .hd p{margin:4px 0 0 0;font-size:12px;color:var(--muted)}
+    .card .hd p{margin:4px 0 0;font-size:12px;color:var(--muted)}
     .card .bd{padding:14px 16px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;outline:none;font-size:14px;background:#fff}
+    textarea{min-height:92px;resize:vertical}
     .row{display:grid;gap:10px}
     .row.two{grid-template-columns:1fr}
     @media(min-width:700px){.row.two{grid-template-columns:1fr 1fr}}
-    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
-    input, select, textarea{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:12px;
-      outline:none;
-      font-size:14px;
-      background:#fff;
-    }
-    textarea{min-height:92px;resize:vertical}
-    input:focus, select:focus, textarea:focus{border-color:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.25)}
     .muted{color:var(--muted);font-size:12px}
-    .badge{
-      display:inline-flex;align-items:center;
-      font-size:12px;font-weight:700;
-      padding:3px 10px;border-radius:999px;
-      border:1px solid var(--border);
-      background:#f8fafc;
-    }
+    .badge{display:inline-flex;align-items:center;font-size:12px;font-weight:900;padding:3px 10px;border-radius:999px;border:1px solid var(--border);background:#f8fafc}
     .badge.final{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
     .badge.draft{background:#f1f5f9;border-color:#e2e8f0;color:#334155}
-    .section{
-      border:1px solid var(--border);
-      border-radius:14px;
-      overflow:hidden;
-      background:#fff;
-      margin-top:12px;
-    }
-    .section .shd{
-      padding:10px 12px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      background:#f8fafc;
-      border-bottom:1px solid var(--border);
-    }
+    .hr{height:1px;background:var(--border);margin:12px 0}
+    .section{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;margin-top:12px}
+    .section .shd{padding:10px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:#f8fafc;border-bottom:1px solid var(--border)}
     .section .shd b{font-size:13px}
-    .toggle{
-      display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);user-select:none;
-    }
-    .switch{
-      width:44px;height:26px;border-radius:999px;background:#e2e8f0;position:relative;cursor:pointer;flex:0 0 auto;
-      border:1px solid #cbd5e1;
-    }
-    .switch::after{
-      content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.15);
-      transition:all .18s ease;
-    }
-    .switch.on{background:#16a34a;border-color:#16a34a}
+    .switch{width:44px;height:26px;border-radius:999px;background:#e2e8f0;position:relative;cursor:pointer;flex:0 0 auto;border:1px solid #cbd5e1}
+    .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.15);transition:all .18s ease}
+    .switch.on{background:var(--ok);border-color:var(--ok)}
     .switch.on::after{left:21px}
-    .tbl{
-      width:100%;
-      border-collapse:collapse;
-    }
-    .tbl th,.tbl td{
-      border-top:1px solid var(--border);
-      padding:10px 10px;
-      font-size:13px;
-      vertical-align:middle;
-    }
-    .tbl th{background:#fff;text-align:left;color:var(--muted);font-size:12px}
-    .tbl td.right{text-align:right}
+    .tbl{width:100%;border-collapse:collapse}
+    .tbl th,.tbl td{border-top:1px solid var(--border);padding:10px 10px;font-size:13px;vertical-align:middle}
+    .tbl th{color:var(--muted);font-size:12px;text-align:left}
+    .right{text-align:right}
     .inline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .totbox{
-      border:1px dashed #cbd5e1;
-      border-radius:14px;
-      padding:12px;
-      background:#fafcff;
-    }
+    .totbox{border:1px dashed #cbd5e1;border-radius:14px;padding:12px;background:#fafcff}
     .totline{display:flex;justify-content:space-between;gap:10px;align-items:flex-end}
     .totline b{font-size:16px}
-    .totline span{font-variant-numeric: tabular-nums;}
-    .hr{height:1px;background:var(--border);margin:12px 0}
     .rightbox .card{position:sticky;top:76px}
-    .foot-actions{display:flex;gap:8px;flex-wrap:wrap}
-
-    /* Print */
     @media print{
       .no-print{display:none !important}
       body{background:#fff}
@@ -160,22 +69,14 @@
       .section{border:1px solid #cbd5e1}
     }
     @page{size:A4;margin:20mm}
-    .surat{
-      padding:0;
-    }
-    .surat h1{
-      text-align:center;
-      font-size:15px;
-      letter-spacing:.6px;
-      margin:0;
-    }
-    .surat .nomor{ text-align:center; margin-top:6px; font-size:13px}
+    .surat h1{text-align:center;font-size:15px;letter-spacing:.6px;margin:0}
+    .surat .nomor{text-align:center;margin-top:6px;font-size:13px}
     .surat .p{font-size:13px;line-height:1.55;margin:12px 0}
     .surat .tabel{width:100%;border-collapse:collapse;margin-top:6px}
     .surat .tabel td{border-top:1px solid #cbd5e1;padding:7px 8px;font-size:13px}
-    .surat .tabel td.r{text-align:right;font-variant-numeric:tabular-nums;}
+    .surat .tabel td.r{text-align:right;font-variant-numeric:tabular-nums}
     .surat .total{border-top:1px solid #0f172a;margin-top:12px;padding-top:10px}
-    .surat .ttdgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:36px}
+    .surat .ttdgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:22px}
     .surat .ttd{text-align:center;font-size:13px}
     .surat .spacer{height:70px}
   </style>
@@ -201,132 +102,105 @@
   <div class="wrap" id="app"></div>
 
 <script>
-/* ===================== Utilities ===================== */
-const MONTHS_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
-function pad2(n){ return String(n).padStart(2,"0"); }
-function rupiah(n){
-  const v = Number(n||0);
-  return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(v);
-}
-function ymdToIndo(ymd){
-  const [y,m,d]=ymd.split("-");
-  return `${Number(d)} ${MONTHS_ID[Number(m)-1]} ${y}`;
-}
+/* ===================== Utils ===================== */
+const MONTHS_ID=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n||0));}
+function ymdToIndo(ymd){ if(!ymd) return "..............."; const [y,m,d]=ymd.split("-"); return `${Number(d)} ${MONTHS_ID[Number(m)-1]} ${y}`; }
 function numOnly(v){ return Number(String(v||"0").replace(/[^\d]/g,""))||0; }
 function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
-
-/* Terbilang sederhana (cukup untuk produksi dasar) */
-function terbilang(n){
-  n = Math.floor(Number(n||0));
-  if (n === 0) return "nol rupiah";
-  const satuan = ["","satu","dua","tiga","empat","lima","enam","tujuh","delapan","sembilan","sepuluh","sebelas"];
-  function t(x){
-    x = Math.floor(x);
-    if (x < 12) return satuan[x];
-    if (x < 20) return t(x-10)+" belas";
-    if (x < 100) return t(Math.floor(x/10))+" puluh"+(x%10?(" "+t(x%10)):"");
-    if (x < 200) return "seratus"+(x-100?(" "+t(x-100)):"");
-    if (x < 1000) return t(Math.floor(x/100))+" ratus"+(x%100?(" "+t(x%100)):"");
-    if (x < 2000) return "seribu"+(x-1000?(" "+t(x-1000)):"");
-    if (x < 1000000) return t(Math.floor(x/1000))+" ribu"+(x%1000?(" "+t(x%1000)):"");
-    if (x < 1000000000) return t(Math.floor(x/1000000))+" juta"+(x%1000000?(" "+t(x%1000000)):"");
-    if (x < 1000000000000) return t(Math.floor(x/1000000000))+" miliar"+(x%1000000000?(" "+t(x%1000000000)):"");
-    return t(Math.floor(x/1000000000000))+" triliun"+(x%1000000000000?(" "+t(x%1000000000000)):"");
-  }
-  return (t(n) + " rupiah").replace(/\s+/g," ").trim();
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+function dayNameID(ymd){
+  if(!ymd) return "";
+  const d=new Date(ymd+"T00:00:00");
+  return d.toLocaleDateString("id-ID",{weekday:"long"});
 }
 
 /* ===================== Storage ===================== */
-const LS = {
-  get(k, d){ try{ const v = localStorage.getItem(k); return v? JSON.parse(v): d; }catch{ return d; } },
-  set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
+const LS={
+  get(k,d){ try{const v=localStorage.getItem(k); return v?JSON.parse(v):d;}catch{return d;} },
+  set(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
 };
 
-const STATE = {
-  route: "dashboard",
-  editingId: null,
-  previewId: null,
+const DEFAULT_SIGNERS={
+  kepala:{ nama:"NAMA KEPALA SEKSI", jabatan:"Kepala Seksi Pelayanan & Informasi" },
+  bendahara:{ nama:"NAMA BENDAHARA", jabatan:"Bendahara Penerimaan" },
 };
+function loadSettings(){ return LS.get("stsu_settings",{signers:DEFAULT_SIGNERS}); }
+function saveSettings(s){ LS.set("stsu_settings",s); }
 
-const DEFAULT_SIGNERS = {
-  kepala: { nama: "NAMA KEPALA SEKSI", jabatan: "Kepala Seksi Pelayanan & Informasi" },
-  bendahara: { nama: "NAMA BENDAHARA", jabatan: "Bendahara Penerimaan" },
-};
+function loadDB(){ return LS.get("stsu_db",{items:[]}); }
+function saveDB(db){ LS.set("stsu_db",db); }
 
-function loadSettings(){
-  return LS.get("stsu_settings", { signers: DEFAULT_SIGNERS });
-}
-function saveSettings(s){ LS.set("stsu_settings", s); }
-
-function loadDB(){
-  return LS.get("stsu_db", { items: [] });
-}
-function saveDB(db){ LS.set("stsu_db", db); }
-
-function loadCounters(){
-  return LS.get("stsu_counters", { byYear: {} });
-}
-function saveCounters(c){ LS.set("stsu_counters", c); }
+function loadCounters(){ return LS.get("stsu_counters",{byYear:{}}); }
+function saveCounters(c){ LS.set("stsu_counters",c); }
 
 /* ===================== Templates ===================== */
-const TEMPLATE_ITEMS_ETICKETING = [
+const TEMPLATE_ETICKETING=[
   "Dewasa","Anak","Rombongan Dewasa","Rombongan Anak","Taman Satwa Anak","Pusat Primata",
   "H. Biasa Dewasa","H. Biasa Anak","Kendaraan Gol 1","Kendaraan Gol 2","Kendaraan Gol 3","Motor","Sepeda"
 ];
+function makeTemplateItems(){ return TEMPLATE_ETICKETING.map(k=>({kategori:k, nominal:0})); }
 
-const DEFAULT_SECTIONS = [
-  { key:"fasilitas", title:"Pemakaian Fasilitas", enabled:true, items:[] }, // fleksibel (awal kosong)
-  { key:"eticket", title:"E-ticketing", enabled:true, items:TEMPLATE_ITEMS_ETICKETING.map(k=>({kategori:k, nominal:0})) },
-  { key:"online", title:"Tiket Online", enabled:true, items:TEMPLATE_ITEMS_ETICKETING.map(k=>({kategori:k, nominal:0})) },
-  { key:"vending", title:"Vending Machine", enabled:true, items:TEMPLATE_ITEMS_ETICKETING.map(k=>({kategori:k, nominal:0})) },
-  { key:"newgate", title:"New Gate", enabled:true, items:TEMPLATE_ITEMS_ETICKETING.map(k=>({kategori:k, nominal:0})) },
-  { key:"susulan", title:"Susulan / Validasi", enabled:true, items:TEMPLATE_ITEMS_ETICKETING.map(k=>({kategori:k, nominal:0})) },
-];
+function defaultSections(){
+  return [
+    { id:crypto.randomUUID(), key:"fasilitas", title:"Pemakaian Fasilitas", note:"fleksibel (sesuai pemakaian hari itu)", enabled:true, items:[] },
+    { id:crypto.randomUUID(), key:"eticket", title:"E-ticketing", note:"template sama seperti e-ticketing", enabled:true, items:makeTemplateItems() },
+    { id:crypto.randomUUID(), key:"online", title:"Tiket Online", note:"template sama seperti e-ticketing", enabled:true, items:makeTemplateItems() },
+    { id:crypto.randomUUID(), key:"vending", title:"Vending Machine", note:"template sama seperti e-ticketing", enabled:true, items:makeTemplateItems() },
+    { id:crypto.randomUUID(), key:"newgate", title:"New Gate", note:"template sama seperti e-ticketing", enabled:true, items:makeTemplateItems() },
+    { id:crypto.randomUUID(), key:"susulan", title:"Susulan / Validasi", note:"template sama seperti e-ticketing", enabled:true, items:makeTemplateItems() },
+  ];
+}
 
-/* ===================== Numbering ===================== */
-/* Pisah counter per tahun & jenis. Tanpa 0 depan. */
-function nextNumber(jenis, tanggalYMD){
-  const year = tanggalYMD.slice(0,4);
+/* ===================== Numbering (based on TANGGAL TRANSAKSI) ===================== */
+function nextNumber(jenis, tanggalTransaksiYMD){
+  const year = tanggalTransaksiYMD.slice(0,4);
+  const dd = tanggalTransaksiYMD.slice(8,10);
+  const mm = tanggalTransaksiYMD.slice(5,7);
+
   const c = loadCounters();
   if(!c.byYear[year]) c.byYear[year] = { RETRIBUSI:0, LAINNYA:0 };
   c.byYear[year][jenis] = (c.byYear[year][jenis]||0) + 1;
   saveCounters(c);
+
   const n = c.byYear[year][jenis];
-
-  const dd = tanggalYMD.slice(8,10);
-  const mm = tanggalYMD.slice(5,7);
-
-  if(jenis === "RETRIBUSI"){
-    return `${n}/${dd}/${mm}/SU/${year}`;
-  }
+  if(jenis==="RETRIBUSI") return `${n}/${dd}/${mm}/SU/${year}`;
   return `${n}/${dd}/${mm}/SU/L/${year}`;
 }
 
-/* ===================== UI Rendering ===================== */
-function go(route){
-  STATE.route = route;
-  STATE.editingId = null;
-  STATE.previewId = null;
-  render();
-}
-
+/* ===================== State / Router ===================== */
+const STATE={ route:"dashboard", editingId:null, previewId:null };
+function go(route){ STATE.route=route; STATE.editingId=null; STATE.previewId=null; render(); }
 function el(id){ return document.getElementById(id); }
 
+/* ===================== Compute totals ===================== */
+function sectionSubtotal(section){
+  if(!section.enabled) return 0;
+  return sum((section.items||[]).map(it=>Number(it.nominal||0)));
+}
+function computeTotal(doc){
+  if(doc.jenis==="LAINNYA") return Number(doc.nominalLainnya||0);
+  return sum((doc.sections||[]).filter(s=>s.enabled).map(s=>sectionSubtotal(s)));
+}
+
+/* ===================== UI ===================== */
 function render(){
   const app = el("app");
-  if(STATE.route === "dashboard") return renderDashboard(app);
-  if(STATE.route === "buat") return renderBuat(app);
-  if(STATE.route === "settings") return renderSettings(app);
-  if(STATE.route === "preview") return renderPreview(app);
+  if(STATE.route==="dashboard") return renderDashboard(app);
+  if(STATE.route==="buat") return renderBuat(app);
+  if(STATE.route==="settings") return renderSettings(app);
+  if(STATE.route==="preview") return renderPreview(app);
 }
 
 /* Dashboard */
 function renderDashboard(app){
-  const db = loadDB();
-  const items = [...db.items].sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-
-  app.innerHTML = `
+  const db=loadDB();
+  const items=[...db.items].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  app.innerHTML=`
     <div class="grid two">
       <div class="card">
         <div class="hd">
@@ -338,7 +212,7 @@ function renderDashboard(app){
         </div>
         <div class="bd">
           <div class="inline no-print" style="justify-content:space-between">
-            <div class="muted">Tip: klik “Preview” untuk cetak PDF.</div>
+            <div class="muted">Klik “Preview” untuk cetak PDF.</div>
             <button class="btn primary" onclick="go('buat')">+ Buat STSU</button>
           </div>
 
@@ -347,7 +221,8 @@ function renderDashboard(app){
               <thead>
                 <tr>
                   <th>Nomor</th>
-                  <th>Tanggal</th>
+                  <th>Tgl Transaksi</th>
+                  <th>Tgl STSU/TTD</th>
                   <th>Jenis</th>
                   <th class="right">Total</th>
                   <th>Status</th>
@@ -357,20 +232,19 @@ function renderDashboard(app){
               <tbody>
                 ${items.length ? items.map(x=>`
                   <tr>
-                    <td><b>${escapeHtml(x.nomor)}</b></td>
-                    <td>${escapeHtml(ymdToIndo(x.tanggalSTSU))}</td>
+                    <td><b>${escapeHtml(x.nomor||"(belum disimpan)")}</b></td>
+                    <td>${escapeHtml(ymdToIndo(x.tanggalTransaksi))}</td>
+                    <td>${escapeHtml(ymdToIndo(x.tanggalTTD))}</td>
                     <td><span class="badge">${escapeHtml(x.jenis)}</span></td>
-                    <td class="right">${rupiah(x.total)}</td>
-                    <td>${x.status === "FINAL" ? `<span class="badge final">FINAL</span>` : `<span class="badge draft">DRAFT</span>`}</td>
+                    <td class="right">${rupiah(x.total||0)}</td>
+                    <td>${x.status==="FINAL" ? `<span class="badge final">FINAL</span>` : `<span class="badge draft">DRAFT</span>`}</td>
                     <td class="no-print">
                       <button class="btn small" onclick="editDoc('${x.id}')">Edit</button>
                       <button class="btn small" onclick="openPreview('${x.id}')">Preview</button>
                       <button class="btn small danger" onclick="deleteDoc('${x.id}')">Hapus</button>
                     </td>
                   </tr>
-                `).join("") : `
-                  <tr><td colspan="6" class="muted" style="padding:14px">Belum ada data. Klik “Buat STSU”.</td></tr>
-                `}
+                `).join("") : `<tr><td colspan="7" class="muted" style="padding:14px">Belum ada data.</td></tr>`}
               </tbody>
             </table>
           </div>
@@ -379,27 +253,21 @@ function renderDashboard(app){
 
       <div class="rightbox">
         <div class="card">
-          <div class="hd">
-            <div>
-              <h3>Ringkasan</h3>
-              <p>Otomatis dari data tersimpan</p>
-            </div>
-          </div>
+          <div class="hd"><div><h3>Ringkasan</h3><p>Otomatis dari data tersimpan</p></div></div>
           <div class="bd">
             ${renderSummary(items)}
             <div class="hr"></div>
-            <div class="muted">Catatan: saat ini data tersimpan di browser (localStorage). Setelah UI fix, baru kita sambungkan ke Firebase untuk multi-user.</div>
+            <div class="muted">Catatan: sekarang masih localStorage. Setelah UI final, baru kita sambungkan ke Firebase agar multi-user.</div>
           </div>
         </div>
       </div>
     </div>
   `;
 }
-
 function renderSummary(items){
-  const totalR = sum(items.filter(x=>x.jenis==="RETRIBUSI").map(x=>x.total));
-  const totalL = sum(items.filter(x=>x.jenis==="LAINNYA").map(x=>x.total));
-  const total = totalR + totalL;
+  const totalR=sum(items.filter(x=>x.jenis==="RETRIBUSI").map(x=>x.total||0));
+  const totalL=sum(items.filter(x=>x.jenis==="LAINNYA").map(x=>x.total||0));
+  const total=totalR+totalL;
   return `
     <div class="totbox">
       <div class="totline"><div class="muted">Total Retribusi</div><span>${rupiah(totalR)}</span></div>
@@ -412,41 +280,40 @@ function renderSummary(items){
 
 /* Buat/Edit */
 function renderBuat(app){
-  const settings = loadSettings();
-  const db = loadDB();
-  let doc = null;
+  const settings=loadSettings();
+  const db=loadDB();
+  let doc=null;
 
   if(STATE.editingId){
-    doc = db.items.find(x=>x.id===STATE.editingId) || null;
+    doc=db.items.find(x=>x.id===STATE.editingId)||null;
   }
-
-  // default new doc
   if(!doc){
-    doc = {
-      id: crypto.randomUUID(),
-      jenis: "RETRIBUSI",
-      tanggalSTSU: new Date().toISOString().slice(0,10),
-      status: "DRAFT",
-      nomor: "",
-      uraian: "",
-      nominalLainnya: 0,
-      sections: JSON.parse(JSON.stringify(DEFAULT_SECTIONS)),
-      signers: JSON.parse(JSON.stringify(settings.signers)),
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+    const today=new Date().toISOString().slice(0,10);
+    doc={
+      id:crypto.randomUUID(),
+      jenis:"RETRIBUSI",
+      tanggalTransaksi:today,   // WAJIB (untuk nomor)
+      tanggalTTD:"",            // OPSIONAL (untuk Jakarta, ...)
+      status:"DRAFT",
+      nomor:"",
+      uraian:"",
+      nominalLainnya:0,
+      sections:defaultSections(),
+      signers:JSON.parse(JSON.stringify(settings.signers)),
+      createdAt:Date.now(),
+      updatedAt:Date.now(),
     };
   }
 
-  // compute total
-  doc.total = computeTotal(doc);
+  doc.total=computeTotal(doc);
 
-  app.innerHTML = `
+  app.innerHTML=`
     <div class="grid two">
       <div class="card">
         <div class="hd">
           <div>
             <h2>${STATE.editingId ? "Edit STSU" : "Buat STSU"}</h2>
-            <p>Jenis Retribusi/Lainnya, nomor otomatis, preview A4 siap cetak.</p>
+            <p>Nomor STSU dibuat dari <b>Tanggal Transaksi</b>. Tanggal STSU/TTD bisa diisi belakangan.</p>
           </div>
           <span class="badge ${doc.status==="FINAL"?"final":"draft"}">${doc.status}</span>
         </div>
@@ -460,19 +327,29 @@ function renderBuat(app){
               </select>
             </div>
             <div>
-              <label>Tanggal STSU</label>
-              <input id="tanggalSTSU" type="date" value="${doc.tanggalSTSU}">
+              <label>Tanggal Transaksi (wajib)</label>
+              <input id="tglTrans" type="date" value="${doc.tanggalTransaksi}">
+              <div class="muted">Dipakai untuk nomor STSU & kalimat penutup.</div>
             </div>
           </div>
 
-          <div class="row" style="margin-top:10px">
-            <div class="muted">Nomor dibuat saat klik <b>Simpan</b> pertama kali. (Counter pisah Retribusi/Lainnya, reset per tahun)</div>
+          <div class="row two" style="margin-top:10px">
+            <div>
+              <label>Tanggal STSU / TTD (boleh kosong saat draft)</label>
+              <input id="tglTTD" type="date" value="${escapeHtml(doc.tanggalTTD||"")}">
+              <div class="muted">Dipakai di bagian: “Jakarta, …”</div>
+            </div>
+            <div>
+              <label>Nomor STSU</label>
+              <input value="${escapeHtml(doc.nomor||"(dibuat saat Simpan pertama kali)")}" disabled>
+              <div class="muted">Counter reset per tahun, lanjut terus.</div>
+            </div>
           </div>
 
-          <div id="formArea" style="margin-top:6px"></div>
+          <div id="formArea" style="margin-top:10px"></div>
 
           <div class="hr"></div>
-          <div class="foot-actions no-print">
+          <div class="inline no-print" style="justify-content:flex-end">
             <button class="btn" onclick="go('dashboard')">Kembali</button>
             <button class="btn primary" onclick="saveDoc()">Simpan</button>
             <button class="btn" onclick="openPreviewCurrent()">Preview</button>
@@ -483,158 +360,172 @@ function renderBuat(app){
 
       <div class="rightbox">
         <div class="card">
-          <div class="hd">
-            <div>
-              <h3>Ringkasan</h3>
-              <p>Total & terbilang otomatis</p>
-            </div>
-          </div>
+          <div class="hd"><div><h3>Ringkasan</h3><p>Total + per-section subtotal</p></div></div>
           <div class="bd">
             <div class="totbox">
               <div class="totline"><div class="muted">Total</div><b id="sumTotal">${rupiah(doc.total)}</b></div>
-              <div class="hr"></div>
-              <div class="muted">Terbilang</div>
-              <div style="margin-top:6px;font-size:13px;line-height:1.45"><i id="sumTerbilang">${escapeHtml(terbilang(doc.total))}</i></div>
+              ${doc.jenis==="RETRIBUSI" ? `
+                <div class="hr"></div>
+                <div class="muted">Subtotal per section</div>
+                <div id="sumSections" style="margin-top:6px; display:grid; gap:6px"></div>
+              ` : ``}
             </div>
             <div class="hr"></div>
-            <div class="muted">Penandatangan mengikuti Settings dan disalin ke dokumen saat disimpan (arsip aman walau pejabat berubah).</div>
+            <div class="muted">Penandatangan bisa diubah di Settings.</div>
           </div>
         </div>
       </div>
     </div>
   `;
 
-  // Keep draft doc in memory for interactions
   window.__DOC__ = doc;
 
-  // wire events
   el("jenis").addEventListener("change", ()=>{
-    window.__DOC__.jenis = el("jenis").value;
+    doc.jenis = el("jenis").value;
     renderFormArea();
     refreshTotals();
   });
-  el("tanggalSTSU").addEventListener("change", ()=>{
-    window.__DOC__.tanggalSTSU = el("tanggalSTSU").value;
+  el("tglTrans").addEventListener("change", ()=>{
+    doc.tanggalTransaksi = el("tglTrans").value;
+  });
+  el("tglTTD").addEventListener("change", ()=>{
+    doc.tanggalTTD = el("tglTTD").value;
   });
 
   renderFormArea();
+  refreshTotals();
 }
 
 function renderFormArea(){
-  const doc = window.__DOC__;
-  const area = el("formArea");
+  const doc=window.__DOC__;
+  const area=el("formArea");
 
-  if(doc.jenis === "LAINNYA"){
-    area.innerHTML = `
+  if(doc.jenis==="LAINNYA"){
+    area.innerHTML=`
       <div class="section">
         <div class="shd">
-          <b>STSU Pendapatan Lainnya</b>
-          <span class="muted">uraian + nominal</span>
+          <div><b>STSU Pendapatan Lainnya</b><div class="muted">uraian + nominal</div></div>
         </div>
         <div style="padding:12px">
           <div class="row">
             <div>
               <label>Uraian</label>
-              <textarea id="uraian" placeholder="Isi uraian (bisa template/manual)">${escapeHtml(doc.uraian||"")}</textarea>
-              <div class="muted">Contoh: Disetor uang ke Bendahara Penerimaan hasil pendapatan lainnya ...</div>
+              <textarea id="uraian" placeholder="Isi uraian sesuai kebutuhan">${escapeHtml(doc.uraian||"")}</textarea>
             </div>
             <div class="row two">
               <div>
                 <label>Nominal</label>
-                <input id="nominalL" inputmode="numeric" placeholder="0" value="${doc.nominalLainnya||0}">
+                <input id="nominalL" inputmode="numeric" value="${doc.nominalLainnya||0}" placeholder="0">
               </div>
               <div>
-                <label>Template (opsional)</label>
-                <select id="templateL">
-                  <option value="">— pilih (opsional) —</option>
-                  <option value="a">Disetor uang ke Bendahara Penerimaan hasil pendapatan lainnya...</option>
-                  <option value="b">Disetor uang pendapatan operasional (lainnya)...</option>
-                </select>
+                <label>Catatan</label>
+                <input value="Penutup otomatis menyebut No. STSU & nominal" disabled>
               </div>
             </div>
-          </div>
-          <div class="inline no-print" style="justify-content:flex-end;margin-top:10px">
-            <button class="btn small" onclick="applyTemplate()">Pakai Template</button>
           </div>
         </div>
       </div>
     `;
-
     el("uraian").addEventListener("input", ()=>{ doc.uraian = el("uraian").value; });
     el("nominalL").addEventListener("input", ()=>{
       doc.nominalLainnya = numOnly(el("nominalL").value);
       el("nominalL").value = doc.nominalLainnya;
       refreshTotals();
     });
-
     return;
   }
 
-  // Retribusi sections
-  area.innerHTML = doc.sections.map((s, idx)=>renderSectionUI(s, idx)).join("");
+  // Retribusi: sections + add custom section
+  area.innerHTML=`
+    <div class="inline no-print" style="justify-content:space-between">
+      <div class="muted">Section bisa ditambah custom (mis: Retribusi Juru Foto, Retribusi Foto, dll).</div>
+      <button class="btn small primary" onclick="addCustomSection()">+ Tambah Section</button>
+    </div>
+    ${doc.sections.map((s,idx)=>renderSectionUI(s,idx)).join("")}
+  `;
 
-  // attach handlers for each section
-  doc.sections.forEach((s, idx)=>{
+  // wire handlers
+  doc.sections.forEach((s)=>{
     // toggle
-    const sw = el(`sw_${s.key}`);
+    const sw=el(`sw_${s.id}`);
     sw.addEventListener("click", ()=>{
       s.enabled = !s.enabled;
       renderFormArea();
       refreshTotals();
     });
 
+    // rename title
+    const titleInput = el(`title_${s.id}`);
+    if(titleInput){
+      titleInput.addEventListener("input", ()=>{
+        s.title = titleInput.value;
+        refreshTotals();
+      });
+    }
+
     // add row
-    const addBtn = el(`add_${s.key}`);
-    addBtn.addEventListener("click", ()=>{
-      s.items.push({ kategori:"", nominal:0 });
+    el(`add_${s.id}`).addEventListener("click", ()=>{
+      s.items.push({kategori:"", nominal:0});
       renderFormArea();
       refreshTotals();
     });
 
-    // row inputs
-    s.items.forEach((it, rIdx)=>{
-      const k = el(`k_${s.key}_${rIdx}`);
-      const n = el(`n_${s.key}_${rIdx}`);
-      if(k){
-        k.addEventListener("input", ()=>{ it.kategori = k.value; });
-      }
-      if(n){
-        n.addEventListener("input", ()=>{
-          it.nominal = numOnly(n.value);
-          n.value = it.nominal;
-          refreshTotals();
-        });
-      }
+    // delete section (only for custom)
+    const delSec = el(`delsec_${s.id}`);
+    if(delSec){
+      delSec.addEventListener("click", ()=>{
+        if(!confirm("Hapus section ini?")) return;
+        const doc=window.__DOC__;
+        doc.sections = doc.sections.filter(x=>x.id!==s.id);
+        renderFormArea();
+        refreshTotals();
+      });
+    }
 
-      const del = el(`del_${s.key}_${rIdx}`);
-      if(del){
-        del.addEventListener("click", ()=>{
-          s.items.splice(rIdx,1);
-          renderFormArea();
-          refreshTotals();
-        });
-      }
+    // rows
+    s.items.forEach((it,rIdx)=>{
+      const k=el(`k_${s.id}_${rIdx}`);
+      const n=el(`n_${s.id}_${rIdx}`);
+      if(k) k.addEventListener("input", ()=>{ it.kategori = k.value; });
+      if(n) n.addEventListener("input", ()=>{
+        it.nominal = numOnly(n.value);
+        n.value = it.nominal;
+        refreshTotals();
+      });
+      const del=el(`del_${s.id}_${rIdx}`);
+      if(del) del.addEventListener("click", ()=>{
+        s.items.splice(rIdx,1);
+        renderFormArea();
+        refreshTotals();
+      });
     });
   });
 }
 
-function renderSectionUI(section, idx){
-  const enabled = section.enabled;
-  const swClass = enabled ? "switch on" : "switch";
-  const bodyStyle = enabled ? "" : "style='display:none'";
-  const rows = section.items.length ? section.items : [];
-  const isFasilitas = section.key === "fasilitas";
+function renderSectionUI(section){
+  const enabled=section.enabled;
+  const swClass=enabled?"switch on":"switch";
+  const bodyStyle=enabled?"":"style='display:none'";
+  const rows=section.items||[];
+  const isCustom = (section.key||"") === "custom";
+  const subtotal = sectionSubtotal(section);
 
   return `
     <div class="section">
       <div class="shd">
-        <div>
-          <b>${escapeHtml(section.title)}</b>
-          <div class="muted">${isFasilitas ? "fleksibel (sesuai pemakaian hari itu)" : "template sama seperti e-ticketing"}</div>
+        <div style="min-width:0;flex:1">
+          ${isCustom ? `
+            <input id="title_${section.id}" value="${escapeHtml(section.title)}" style="font-weight:800" />
+          ` : `
+            <b>${escapeHtml(section.title)}</b>
+          `}
+          <div class="muted">${escapeHtml(section.note||"")}</div>
+          <div class="muted"><b>Subtotal:</b> ${rupiah(subtotal)}</div>
         </div>
-        <div class="toggle no-print">
-          <span>${enabled ? "Aktif" : "Nonaktif"}</span>
-          <div id="sw_${section.key}" class="${swClass}" title="Toggle"></div>
+        <div class="inline no-print" style="gap:8px">
+          ${isCustom ? `<button class="btn small danger" id="delsec_${section.id}">Hapus Section</button>` : ``}
+          <div class="muted">${enabled?"Aktif":"Nonaktif"}</div>
+          <div id="sw_${section.id}" class="${swClass}" title="Toggle"></div>
         </div>
       </div>
 
@@ -648,139 +539,148 @@ function renderSectionUI(section, idx){
             </tr>
           </thead>
           <tbody>
-            ${rows.map((it, rIdx)=>`
+            ${rows.map((it,rIdx)=>`
               <tr>
-                <td><input id="k_${section.key}_${rIdx}" value="${escapeHtml(it.kategori||"")}" placeholder="Kategori"></td>
-                <td class="right"><input id="n_${section.key}_${rIdx}" inputmode="numeric" value="${Number(it.nominal||0)}" placeholder="0"></td>
-                <td class="no-print right">
-                  <button class="btn small danger" id="del_${section.key}_${rIdx}" title="Hapus baris">Hapus</button>
-                </td>
+                <td><input id="k_${section.id}_${rIdx}" value="${escapeHtml(it.kategori||"")}" placeholder="Kategori"></td>
+                <td class="right"><input id="n_${section.id}_${rIdx}" inputmode="numeric" value="${Number(it.nominal||0)}" placeholder="0"></td>
+                <td class="no-print right"><button class="btn small danger" id="del_${section.id}_${rIdx}">Hapus</button></td>
               </tr>
             `).join("")}
-            ${rows.length===0 ? `<tr><td colspan="3" class="muted">Belum ada item. Klik “Tambah baris”.</td></tr>` : ""}
+            ${rows.length===0 ? `<tr><td colspan="3" class="muted">Belum ada item. Klik “Tambah baris”.</td></tr>` : ``}
           </tbody>
         </table>
-
         <div class="inline no-print" style="justify-content:flex-end;margin-top:10px">
-          <button class="btn small" id="add_${section.key}">+ Tambah baris</button>
+          <button class="btn small" id="add_${section.id}">+ Tambah baris</button>
         </div>
       </div>
     </div>
   `;
 }
 
-function computeTotal(doc){
-  if(doc.jenis === "LAINNYA") return Number(doc.nominalLainnya||0);
-  let total = 0;
-  doc.sections.forEach(s=>{
-    if(!s.enabled) return;
-    s.items.forEach(it=>{
-      const v = Number(it.nominal||0);
-      total += v;
-    });
+function addCustomSection(){
+  const doc=window.__DOC__;
+  const mode = prompt("Tambah Section Custom:\nKetik 1 = Kosong\nKetik 2 = Copy template e-ticketing", "1");
+  const items = (mode==="2") ? makeTemplateItems() : [];
+  doc.sections.push({
+    id: crypto.randomUUID(),
+    key: "custom",
+    title: "Section Baru (ubah nama)",
+    note: "custom (bisa juru foto / foto / dll)",
+    enabled: true,
+    items
   });
-  return total;
+  renderFormArea();
+  refreshTotals();
 }
 
 function refreshTotals(){
-  const doc = window.__DOC__;
+  const doc=window.__DOC__;
   doc.total = computeTotal(doc);
   if(el("sumTotal")) el("sumTotal").textContent = rupiah(doc.total);
-  if(el("sumTerbilang")) el("sumTerbilang").textContent = terbilang(doc.total);
+
+  if(doc.jenis==="RETRIBUSI" && el("sumSections")){
+    el("sumSections").innerHTML = doc.sections
+      .filter(s=>s.enabled)
+      .map(s=>`<div class="totline"><div class="muted">${escapeHtml(s.title)}</div><span>${rupiah(sectionSubtotal(s))}</span></div>`)
+      .join("");
+  }
 }
 
 /* Actions */
-function applyTemplate(){
-  const doc = window.__DOC__;
-  const t = el("templateL").value;
-  if(!t) return;
-  const map = {
-    a: "Disetor uang ke Bendahara Penerimaan hasil pendapatan lainnya, sbb:",
-    b: "Disetor uang hasil pendapatan operasional (lainnya), tanggal ...",
-  };
-  doc.uraian = map[t] || doc.uraian;
-  el("uraian").value = doc.uraian;
-}
-
 function saveDoc(){
-  const doc = window.__DOC__;
-  const db = loadDB();
-  const settings = loadSettings();
+  const doc=window.__DOC__;
+  const db=loadDB();
+  const settings=loadSettings();
 
-  // ensure signers copied from settings if empty
-  if(!doc.signers) doc.signers = JSON.parse(JSON.stringify(settings.signers));
-
-  // assign number if first save
-  if(!doc.nomor){
-    doc.nomor = nextNumber(doc.jenis, doc.tanggalSTSU);
+  if(!doc.tanggalTransaksi){
+    alert("Tanggal Transaksi wajib diisi.");
+    return;
   }
+
+  // nomor dibuat saat simpan pertama (berdasarkan tanggal transaksi)
+  if(!doc.nomor){
+    doc.nomor = nextNumber(doc.jenis, doc.tanggalTransaksi);
+  }
+
+  // copy signers from settings if missing
+  if(!doc.signers) doc.signers = JSON.parse(JSON.stringify(settings.signers));
 
   doc.total = computeTotal(doc);
   doc.updatedAt = Date.now();
 
-  const idx = db.items.findIndex(x=>x.id===doc.id);
-  if(idx>=0) db.items[idx] = doc;
-  else db.items.push(doc);
-
+  const idx=db.items.findIndex(x=>x.id===doc.id);
+  if(idx>=0) db.items[idx]=doc; else db.items.push(doc);
   saveDB(db);
+
   alert("Tersimpan ✅");
   STATE.editingId = doc.id;
   render();
 }
 
 function finalizeDoc(){
-  const doc = window.__DOC__;
-  if(!confirm("Finalkan dokumen? Setelah final, tetap bisa diedit di versi ini, tapi nanti bisa kita kunci.")) return;
-  doc.status = "FINAL";
+  const doc=window.__DOC__;
+  if(!doc.nomor){
+    alert("Simpan dulu agar nomor STSU terbentuk.");
+    return;
+  }
+  if(!doc.tanggalTTD){
+    alert("Isi dulu Tanggal STSU/TTD sebelum Final.");
+    return;
+  }
+  doc.status="FINAL";
   saveDoc();
 }
 
 function editDoc(id){
-  STATE.route = "buat";
-  STATE.editingId = id;
+  STATE.route="buat";
+  STATE.editingId=id;
   render();
 }
-
 function deleteDoc(id){
   if(!confirm("Hapus dokumen ini?")) return;
-  const db = loadDB();
+  const db=loadDB();
   db.items = db.items.filter(x=>x.id!==id);
   saveDB(db);
   render();
 }
-
 function openPreview(id){
-  STATE.route = "preview";
-  STATE.previewId = id;
+  STATE.route="preview";
+  STATE.previewId=id;
   render();
 }
-
 function openPreviewCurrent(){
-  const doc = window.__DOC__;
+  const doc=window.__DOC__;
   if(!doc.nomor){
-    alert("Simpan dulu agar nomor dibuat otomatis.");
+    alert("Simpan dulu agar nomor STSU terbentuk.");
     return;
   }
-  STATE.route = "preview";
-  STATE.previewId = doc.id;
-  // ensure it's saved so preview reads latest
   saveDoc();
+  STATE.route="preview";
+  STATE.previewId=doc.id;
+  render();
 }
 
 /* Preview */
 function renderPreview(app){
-  const db = loadDB();
-  const doc = db.items.find(x=>x.id===STATE.previewId);
+  const db=loadDB();
+  const doc=db.items.find(x=>x.id===STATE.previewId);
   if(!doc){
-    app.innerHTML = `<div class="card"><div class="bd">Dokumen tidak ditemukan. <button class="btn" onclick="go('dashboard')">Kembali</button></div></div>`;
+    app.innerHTML=`<div class="card"><div class="bd">Dokumen tidak ditemukan. <button class="btn" onclick="go('dashboard')">Kembali</button></div></div>`;
     return;
   }
 
-  const total = doc.total || 0;
+  const total=doc.total||0;
 
-  app.innerHTML = `
+  // Penutup sesuai foto (Retribusi)
+  const penutupRetribusi = `
+    Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR
+    pada hari ${escapeHtml(dayNameID(doc.tanggalTransaksi))} tanggal ${escapeHtml(ymdToIndo(doc.tanggalTransaksi))}
+    dengan STSU No. ${escapeHtml(doc.nomor)} dengan uang sebesar ${rupiah(total)}
+  `.replace(/\s+/g," ").trim();
+
+  app.innerHTML=`
     <div class="no-print inline" style="justify-content:space-between">
-      <div class="muted">Preview Surat A4 • Nominal 0 disembunyikan</div>
+      <div class="muted">Preview Surat A4 • Menampilkan subtotal per section</div>
       <div class="inline">
         <button class="btn" onclick="go('dashboard')">Kembali</button>
         <button class="btn" onclick="editDoc('${doc.id}')">Edit</button>
@@ -791,25 +691,25 @@ function renderPreview(app){
     <div class="card surat" style="margin-top:12px">
       <div class="bd">
         <h1>SURAT TANDA SETOR UANG</h1>
-        <div class="nomor">No: ${escapeHtml(doc.nomor)}</div>
+        <div class="nomor">No: ${escapeHtml(doc.nomor||"")}</div>
 
         ${doc.jenis==="LAINNYA" ? `
-          <div class="p">${escapeHtml(doc.uraian || "Disetor uang ke Bendahara Penerimaan hasil pendapatan lainnya, sbb:")}</div>
+          <div class="p">${escapeHtml(doc.uraian||"")}</div>
           <div class="p"><b>${rupiah(doc.nominalLainnya||0)}</b></div>
-          <div class="p">Terbilang: <i>${escapeHtml(terbilang(doc.nominalLainnya||0))}</i></div>
         ` : `
-          <div class="p">Disetor uang ke Bendahara Penerimaan hasil pendapatan retribusi, dengan rincian sebagai berikut:</div>
-          ${renderSuratSections(doc)}
+          ${renderSuratSectionsWithSubtotal(doc)}
           <div class="total">
             <div style="display:flex;justify-content:space-between;gap:10px;font-size:13px">
               <b>JUMLAH TOTAL</b>
               <b>${rupiah(total)}</b>
             </div>
-            <div class="p" style="margin:6px 0 0 0">Terbilang: <i>${escapeHtml(terbilang(total))}</i></div>
           </div>
+          <div class="p" style="margin-top:10px">${escapeHtml(penutupRetribusi)}</div>
         `}
 
-        <div class="p" style="text-align:right;margin-top:18px">Jakarta, ${escapeHtml(ymdToIndo(doc.tanggalSTSU))}</div>
+        <div class="p" style="text-align:right;margin-top:12px">
+          Jakarta, ${escapeHtml(ymdToIndo(doc.tanggalTTD))}
+        </div>
 
         <div class="ttdgrid">
           <div class="ttd">
@@ -828,17 +728,22 @@ function renderPreview(app){
   `;
 }
 
-function renderSuratSections(doc){
-  const parts = [];
-  doc.sections.forEach(s=>{
+function renderSuratSectionsWithSubtotal(doc){
+  const parts=[];
+  (doc.sections||[]).forEach(s=>{
     if(!s.enabled) return;
-    const rows = (s.items||[])
-      .filter(it => Number(it.nominal||0) !== 0) // hide 0
-      .filter(it => (it.kategori||"").trim() !== "");
-    if(rows.length === 0) return;
+    const rows=(s.items||[])
+      .filter(it=>Number(it.nominal||0)!==0)
+      .filter(it=>(it.kategori||"").trim()!=="");
+    if(rows.length===0) return;
+
+    const sub = sum(rows.map(it=>Number(it.nominal||0)));
 
     parts.push(`
-      <div class="p" style="margin-bottom:6px"><b>${escapeHtml(s.title)}</b></div>
+      <div class="p" style="margin-bottom:6px">
+        <b>${escapeHtml(s.title)}</b>
+        <span style="float:right"><b>Subtotal:</b> ${rupiah(sub)}</span>
+      </div>
       <table class="tabel">
         ${rows.map(it=>`
           <tr>
@@ -854,20 +759,19 @@ function renderSuratSections(doc){
 
 /* Settings */
 function renderSettings(app){
-  const s = loadSettings();
-
-  app.innerHTML = `
+  const s=loadSettings();
+  app.innerHTML=`
     <div class="grid two">
       <div class="card">
         <div class="hd">
           <div>
             <h2>Settings</h2>
-            <p>Ubah penandatangan (dinamis). Berlaku untuk dokumen baru yang dibuat setelah perubahan.</p>
+            <p>Ubah penandatangan (dinamis).</p>
           </div>
         </div>
         <div class="bd">
           <div class="section">
-            <div class="shd"><b>Penandatangan</b><span class="muted">editable</span></div>
+            <div class="shd"><div><b>Penandatangan</b><div class="muted">editable</div></div></div>
             <div style="padding:12px">
               <div class="row two">
                 <div>
@@ -879,7 +783,6 @@ function renderSettings(app){
                   <input id="ks_jab" value="${escapeHtml(s.signers.kepala.jabatan)}">
                 </div>
               </div>
-
               <div class="row two" style="margin-top:10px">
                 <div>
                   <label>Bendahara - Nama</label>
@@ -890,7 +793,6 @@ function renderSettings(app){
                   <input id="bd_jab" value="${escapeHtml(s.signers.bendahara.jabatan)}">
                 </div>
               </div>
-
               <div class="inline no-print" style="justify-content:flex-end;margin-top:12px">
                 <button class="btn" onclick="go('dashboard')">Kembali</button>
                 <button class="btn primary" onclick="saveSigners()">Simpan</button>
@@ -899,25 +801,26 @@ function renderSettings(app){
           </div>
 
           <div class="hr"></div>
-          <div class="muted">Info: Saat ini aplikasi menyimpan data di browser (localStorage). Nanti jika sudah siap, kita sambungkan ke Firebase supaya multi-user dan data aman di cloud.</div>
+          <div class="inline no-print" style="justify-content:flex-end">
+            <button class="btn danger" onclick="resetAll()">Reset Semua Data Lokal</button>
+          </div>
+          <div class="muted" style="margin-top:8px">Reset akan menghapus data STSU & counter di perangkat ini.</div>
         </div>
       </div>
 
       <div class="rightbox">
         <div class="card">
-          <div class="hd"><div><h3>Tools</h3><p>Reset data lokal (opsional)</p></div></div>
+          <div class="hd"><div><h3>Catatan</h3><p>Versi GitHub Pages</p></div></div>
           <div class="bd">
-            <button class="btn danger" onclick="resetAll()">Reset Semua Data Lokal</button>
-            <div class="muted" style="margin-top:10px">Hati-hati: ini menghapus data STSU dan counter di perangkat ini.</div>
+            <div class="muted">Sekarang penyimpanan masih localStorage (per browser). Kalau sudah fix, kita pindah ke Firebase agar data aman dan bisa multi-user.</div>
           </div>
         </div>
       </div>
     </div>
   `;
 }
-
 function saveSigners(){
-  const s = loadSettings();
+  const s=loadSettings();
   s.signers.kepala.nama = el("ks_nama").value.trim();
   s.signers.kepala.jabatan = el("ks_jab").value.trim();
   s.signers.bendahara.nama = el("bd_nama").value.trim();
@@ -926,7 +829,6 @@ function saveSigners(){
   alert("Settings tersimpan ✅");
   go("dashboard");
 }
-
 function resetAll(){
   if(!confirm("Reset semua data lokal?")) return;
   localStorage.removeItem("stsu_db");
@@ -934,16 +836,6 @@ function resetAll(){
   localStorage.removeItem("stsu_settings");
   alert("Sudah direset.");
   go("dashboard");
-}
-
-/* Helpers */
-function escapeHtml(str){
-  return String(str ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
 }
 
 /* Init */
