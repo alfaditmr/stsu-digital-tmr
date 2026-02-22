@@ -87,25 +87,29 @@
     .surat .tabel td.r{
       text-align:right;
       font-variant-numeric:tabular-nums;
-      padding-right:110px; /* ✅ item lebih kiri (naikkan kalau mau lebih kiri lagi) */
+      padding-right:110px; /* ✅ item lebih kiri */
       white-space:nowrap;
     }
 
-    /* ✅ Subtotal 1 baris sejajar: "Subtotal X ----- Rp ...." */
+    /* ✅ SUBTOTAL NEMPEL KE ANGKA (label rata kanan mendekat nominal) */
     .surat .subline{
       display:flex;
-      justify-content:flex-end;
       align-items:baseline;
-      gap:10px;
       margin:6px 0 10px;
       font-size:12.6px;
-      font-weight:900;
+      font-weight:900;                 /* ✅ bold */
       font-variant-numeric:tabular-nums;
-      white-space:nowrap;  /* ✅ tidak turun baris */
-      overflow:hidden;
+      white-space:nowrap;
     }
-    .surat .subline .left,
+    .surat .subline .left{
+      flex:1;                          /* ✅ ambil sisa ruang */
+      text-align:right;                /* ✅ label rata kanan */
+      padding-right:12px;              /* ✅ jarak kecil sebelum angka */
+      white-space:nowrap;
+    }
     .surat .subline .right{
+      min-width:160px;                 /* ✅ kolom angka stabil */
+      text-align:right;                /* ✅ angka rata kanan */
       white-space:nowrap;
     }
 
