@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STSU Digital TMR</title>
+
+<style>
+body{font-family:Arial;background:#f1f5f9;margin:0}
+header{background:white;padding:15px;display:flex;justify-content:space-between;border-bottom:1px solid #ddd}
+main{max-width:1000px;margin:30px auto;background:white;padding:30px}
+button{padding:6px 12px;border:none;background:black;color:white;cursor:pointer;margin:3px}
+input,select{padding:5px;margin:3px}
+table{width:100%;border-collapse:collapse;margin-top:5px}
+td{border-top:1px solid #ccc;padding:5px}
+.right{text-align:right}
+.center{text-align:center}
+.section-box{border:1px solid #ccc;padding:10px;margin-bottom:15px}
+.hidden{display:none}
+@media print{
+ header, .no-print{display:none}
+ body{background:white}
+}
+@page{size:A4;margin:20mm}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div><b>Sistem STSU Digital</b></div>
+  <div>
+    <button onclick="showDashboard()">Dashboard</button>
+    <button onclick="showForm()">Buat STSU</button>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<script>
+
+let counterRetribusi = 15
+let counterLainnya = 5
+
+let currentData = null
+
+function rupiah(n){
+  return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR"}).format(n||0)
+}
+
+function terbilang(n){
+  return "(terbilang otomatis nanti disempurnakan)"
+}
+
+function formatTanggal(date){
+  return new Date(date).toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"})
+}
+
+function showDashboard(){
+  document.getElementById("app").innerHTML=`
+    <h2>Dashboard</h2>
+    <p>Sistem STSU siap digunakan.</p>
+    <button onclick="showForm()">+ Buat STSU Baru</button>
+  `
+}
+
+function showForm(){
+  document.getElementById("app").innerHTML=`
+    <h2>Buat STSU</h2>
+
+    Jenis:
+    <select id="jenis">
+      <option value="RETRIBUSI">Retribusi</option>
+      <option value="LAINNYA">Lainnya</option>
+    </select>
+
+    <br>
+    Tanggal STSU:
+    <input type="date" id="tanggal">
+
+    <br><br>
+
+    <div id="formArea"></div>
+
+    <button onclick="generatePreview()">Preview Surat</button>
+  `
+
+  document.getElementById("jenis").addEventListener("change",renderForm)
+  renderForm()
+}
+
+function renderForm(){
+  let jenis=document.getElementById("jenis").value
+  let html=""
+
+  if(jenis==="RETRIBUSI"){
+    html+=renderSection("Pemakaian Fasilitas")
+    html+=renderSection("E-ticketing")
+    html+=renderSection("Tiket Online")
+  }else{
+    html+=`
+      Uraian:
+      <br>
+      <textarea id="uraian" style="width:100%;height:80px"></textarea>
+      <br>
+      Nominal:
+      <input type="number" id="nominalLainnya">
+    `
+  }
+
+  document.getElementById("formArea").innerHTML=html
+}
+
+function renderSection(nama){
+  return `
+    <div class="section-box">
+      <b>${nama}</b>
+      <table>
+        <tr><td>Kategori</td><td>Nominal</td></tr>
+        <tr>
+          <td><input type="text" value="Dewasa"></td>
+          <td><input type="number"></td>
+        </tr>
+        <tr>
+          <td><input type="text" value="Anak"></td>
+          <td><input type="number"></td>
+        </tr>
+      </table>
+    </div>
+  `
+}
+
+function generatePreview(){
+  let jenis=document.getElementById("jenis").value
+  let tanggal=document.getElementById("tanggal").value
+  if(!tanggal){alert("Isi tanggal dulu");return}
+
+  let nomor=""
+  if(jenis==="RETRIBUSI"){
+    counterRetribusi++
+    nomor=counterRetribusi+"/"+tanggal.slice(8,10)+"/"+tanggal.slice(5,7)+"/SU/"+tanggal.slice(0,4)
+  }else{
+    counterLainnya++
+    nomor=counterLainnya+"/"+tanggal.slice(8,10)+"/"+tanggal.slice(5,7)+"/SU/L/"+tanggal.slice(0,4)
+  }
+
+  let html=`
+    <div class="no-print">
+      <button onclick="window.print()">Cetak / PDF</button>
+      <button onclick="showDashboard()">Kembali</button>
+    </div>
+
+    <div class="center">
+      <h2>SURAT TANDA SETOR UANG</h2>
+      <p>No: ${nomor}</p>
+    </div>
+  `
+
+  if(jenis==="LAINNYA"){
+    let uraian=document.getElementById("uraian").value
+    let nominal=parseInt(document.getElementById("nominalLainnya").value||0)
+
+    html+=`
+      <p>${uraian}</p>
+      <p><b>${rupiah(nominal)}</b></p>
+      <p>Terbilang: ${terbilang(nominal)}</p>
+    `
+  }else{
+    html+=`<p>Disetor uang hasil pendapatan retribusi:</p>`
+  }
+
+  html+=`
+    <div style="margin-top:50px;text-align:right">
+      Jakarta, ${formatTanggal(tanggal)}
+    </div>
+
+    <div style="margin-top:80px;display:flex;justify-content:space-between">
+      <div class="center">
+        Kepala Seksi<br><br><br>
+        <b>NAMA KEPALA SEKSI</b>
+      </div>
+      <div class="center">
+        Bendahara Penerimaan<br><br><br>
+        <b>NAMA BENDAHARA</b>
+      </div>
+    </div>
+  `
+
+  document.getElementById("app").innerHTML=html
+}
+
+showDashboard()
+
+</script>
+</body>
+</html>
