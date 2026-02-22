@@ -68,6 +68,8 @@
       .card{border:none;box-shadow:none;border-radius:0}
       .section{border:1px solid #cbd5e1}
     }
+
+    /* ===== PRINT A4 ===== */
     @page{size:A4;margin:20mm}
 
     /* ===== Surat Preview (A4) ===== */
@@ -81,21 +83,35 @@
     .surat .tabel{width:100%;border-collapse:collapse;margin-top:6px}
     .surat .tabel td{border-top:1px solid #cbd5e1;padding:5px 8px;font-size:12.6px}
 
-    /* Angka item dibuat lebih kiri (geser dari kanan) */
+    /* Angka item dibuat lebih kiri */
     .surat .tabel td.r{
       text-align:right;
       font-variant-numeric:tabular-nums;
-      padding-right:120px; /* item angka lebih kiri */
+      padding-right:110px; /* ✅ item lebih kiri (naikkan kalau mau lebih kiri lagi) */
+      white-space:nowrap;
     }
 
-    /* Baris subtotal: angka lebih kanan & bold */
-  .surat .subline{
-  text-align:right;              /* ✅ semua rata kanan */
-  margin:6px 0 10px;
-  font-size:12.6px;
-  font-weight:900;
-  font-variant-numeric:tabular-nums;
-}
+    /* Subtotal: label+angka sama-sama nempel kanan (anti wrap bertumpuk) */
+    .surat .subline{
+      display:flex;
+      justify-content:flex-end;
+      align-items:baseline;
+      gap:14px;
+      margin:6px 0 10px;
+      font-size:12.6px;
+      font-variant-numeric:tabular-nums;
+    }
+    .surat .subline .left{
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .surat .subline .right{
+      font-weight:900;
+      min-width:150px;
+      text-align:right;
+      white-space:nowrap;
+      padding-right:0px; /* ✅ subtotal paling kanan */
+    }
 
     .surat .total{border-top:1px solid #0f172a;margin-top:12px;padding-top:10px}
     .surat .ttdgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:22px}
@@ -407,16 +423,11 @@ function renderBuat(app){
 
       <div class="rightbox">
         <div class="card">
-          <div class="hd"><div><h3>Ringkasan</h3><p>Total + per-section subtotal</p></div></div>
+          <div class="hd"><div><h3>Ringkasan</h3><p>Total + terbilang</p></div></div>
           <div class="bd">
             <div class="totbox">
               <div class="totline"><div class="muted">Total</div><b id="sumTotal">${rupiah(doc.total)}</b></div>
               <div class="totline" style="margin-top:6px"><div class="muted">Terbilang</div><span id="sumTerbilang">${escapeHtml(terbilangID(doc.total))}</span></div>
-              ${doc.jenis==="RETRIBUSI" ? `
-                <div class="hr"></div>
-                <div class="muted">Subtotal per section (aktif)</div>
-                <div id="sumSections" style="margin-top:6px; display:grid; gap:6px"></div>
-              ` : ``}
             </div>
             <div class="hr"></div>
             <div class="muted">Penandatangan bisa diubah di Settings.</div>
@@ -433,12 +444,8 @@ function renderBuat(app){
     renderFormArea();
     refreshTotals();
   });
-  el("tglTrans").addEventListener("change", ()=>{
-    doc.tanggalTransaksi = el("tglTrans").value;
-  });
-  el("tglTTD").addEventListener("change", ()=>{
-    doc.tanggalTTD = el("tglTTD").value;
-  });
+  el("tglTrans").addEventListener("change", ()=>{ doc.tanggalTransaksi = el("tglTrans").value; });
+  el("tglTTD").addEventListener("change", ()=>{ doc.tanggalTTD = el("tglTTD").value; });
 
   renderFormArea();
   refreshTotals();
@@ -483,7 +490,6 @@ function renderFormArea(){
     return;
   }
 
-  // Retribusi: sections + add custom section
   area.innerHTML=`
     <div class="inline no-print" style="justify-content:space-between">
       <div class="muted">Section bisa ditambah custom (mis: Retribusi Juru Foto, Retribusi Foto, dll).</div>
@@ -492,9 +498,7 @@ function renderFormArea(){
     ${doc.sections.map((s)=>renderSectionUI(s)).join("")}
   `;
 
-  // wire handlers
   doc.sections.forEach((s)=>{
-    // toggle
     const sw=el(`sw_${s.id}`);
     sw.addEventListener("click", ()=>{
       s.enabled = !s.enabled;
@@ -502,7 +506,6 @@ function renderFormArea(){
       refreshTotals();
     });
 
-    // rename title
     const titleInput = el(`title_${s.id}`);
     if(titleInput){
       titleInput.addEventListener("input", ()=>{
@@ -511,14 +514,12 @@ function renderFormArea(){
       });
     }
 
-    // add row
     el(`add_${s.id}`).addEventListener("click", ()=>{
       s.items.push({kategori:"", nominal:0});
       renderFormArea();
       refreshTotals();
     });
 
-    // delete section (only for custom)
     const delSec = el(`delsec_${s.id}`);
     if(delSec){
       delSec.addEventListener("click", ()=>{
@@ -530,7 +531,6 @@ function renderFormArea(){
       });
     }
 
-    // rows
     s.items.forEach((it,rIdx)=>{
       const k=el(`k_${s.id}_${rIdx}`);
       const n=el(`n_${s.id}_${rIdx}`);
@@ -556,7 +556,6 @@ function renderSectionUI(section){
   const bodyStyle=enabled?"":"style='display:none'";
   const rows=section.items||[];
   const isCustom = (section.key||"") === "custom";
-  const subtotal = sectionSubtotal(section);
 
   return `
     <div class="section">
@@ -597,11 +596,6 @@ function renderSectionUI(section){
           </tbody>
         </table>
 
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed #cbd5e1">
-          <b>Subtotal ${escapeHtml(section.title)}</b>
-          <b>${rupiah(subtotal)}</b>
-        </div>
-
         <div class="inline no-print" style="justify-content:flex-end;margin-top:10px">
           <button class="btn small" id="add_${section.id}">+ Tambah baris</button>
         </div>
@@ -614,7 +608,7 @@ function addCustomSection(){
   const doc=window.__DOC__;
   const mode = prompt("Tambah Section Custom:\nKetik 1 = Kosong\nKetik 2 = Copy template e-ticketing", "1");
   const items = (mode==="2") ? makeTemplateItems() : [];
-  // custom dimasukkan setelah fasilitas, agar terlihat di atas e-ticketing di form juga
+
   const idxF = doc.sections.findIndex(s => (s.key||"")==="fasilitas");
   const newSec = {
     id: crypto.randomUUID(),
@@ -636,13 +630,6 @@ function refreshTotals(){
   doc.total = computeTotal(doc);
   if(el("sumTotal")) el("sumTotal").textContent = rupiah(doc.total);
   if(el("sumTerbilang")) el("sumTerbilang").textContent = terbilangID(doc.total);
-
-  if(doc.jenis==="RETRIBUSI" && el("sumSections")){
-    el("sumSections").innerHTML = doc.sections
-      .filter(s=>s.enabled)
-      .map(s=>`<div class="totline"><div class="muted">${escapeHtml(s.title)}</div><span>${rupiah(sectionSubtotal(s))}</span></div>`)
-      .join("");
-  }
 }
 
 /* Actions */
@@ -656,12 +643,10 @@ function saveDoc(){
     return;
   }
 
-  // nomor dibuat saat simpan pertama (berdasarkan tanggal transaksi)
   if(!doc.nomor){
     doc.nomor = nextNumber(doc.jenis, doc.tanggalTransaksi);
   }
 
-  // copy signers from settings if missing
   if(!doc.signers) doc.signers = JSON.parse(JSON.stringify(settings.signers));
 
   doc.total = computeTotal(doc);
@@ -730,7 +715,6 @@ function renderPreview(app){
 
   const total=doc.total||0;
 
-  // Penutup Retribusi sesuai foto: hari + tanggal transaksi + No STSU + nominal
   const penutupRetribusi = `
     Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR
     pada hari ${escapeHtml(dayNameID(doc.tanggalTransaksi))} tanggal ${escapeHtml(ymdToIndo(doc.tanggalTransaksi))}
@@ -739,7 +723,7 @@ function renderPreview(app){
 
   app.innerHTML=`
     <div class="no-print inline" style="justify-content:space-between">
-      <div class="muted">Preview Surat A4 • Target maksimal 2 halaman</div>
+      <div class="muted">Preview Surat A4 • Pastikan Paper Size: A4 (bukan Letter)</div>
       <div class="inline">
         <button class="btn" onclick="go('dashboard')">Kembali</button>
         <button class="btn" onclick="editDoc('${doc.id}')">Edit</button>
@@ -802,7 +786,6 @@ function renderPreview(app){
 }
 
 function renderSuratSectionsWithSubtotal(doc){
-  // Urutan: fasilitas -> custom -> eticket -> online -> vending -> newgate -> susulan -> lainnya
   const orderRank = (s)=>{
     const k = (s.key||"").toLowerCase();
     if(k==="fasilitas") return 10;
@@ -942,7 +925,3 @@ render();
 </script>
 </body>
 </html>
-
-
-
-
