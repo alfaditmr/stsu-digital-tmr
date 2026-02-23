@@ -87,33 +87,52 @@
     .surat .tabel td.r{
       text-align:right;
       font-variant-numeric:tabular-nums;
-      padding-right:110px; /* ✅ item lebih kiri */
+      padding-right:110px; /* ✅ item angka lebih kiri */
       white-space:nowrap;
     }
 
-    /* ✅ SUBTOTAL NEMPEL KE ANGKA (label rata kanan mendekat nominal) */
+    /* ✅ Subtotal: garis panjang + nempel angka */
     .surat .subline{
       display:flex;
-      align-items:baseline;
-      margin:6px 0 10px;
+      align-items:center;
+      margin:8px 0 12px;
       font-size:12.6px;
-      font-weight:900;                 /* ✅ bold */
+      font-weight:900;
       font-variant-numeric:tabular-nums;
-      white-space:nowrap;
     }
     .surat .subline .left{
-      flex:1;                          /* ✅ ambil sisa ruang */
-      text-align:right;                /* ✅ label rata kanan */
-      padding-right:12px;              /* ✅ jarak kecil sebelum angka */
+      display:flex;
+      align-items:center;
+      flex:1;
+      gap:8px;
+      min-width:0;
+    }
+    .surat .subline .left .text{
       white-space:nowrap;
     }
+    .surat .subline .left .dash{
+      flex:1;
+      border-bottom:1px solid #000;
+      height:1px;
+      transform: translateY(-1px);
+    }
     .surat .subline .right{
-      min-width:160px;                 /* ✅ kolom angka stabil */
-      text-align:right;                /* ✅ angka rata kanan */
+      min-width:170px;
+      text-align:right;
       white-space:nowrap;
     }
 
     .surat .total{border-top:1px solid #0f172a;margin-top:12px;padding-top:10px}
+
+    /* ✅ tanggal rapi di kolom kanan (tidak miring) */
+    .surat .dateLine{
+      width:50%;
+      margin-left:auto;
+      text-align:center;
+      font-size:12.6px;
+      margin-top:14px;
+    }
+
     .surat .ttdgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:22px}
     .surat .ttd{text-align:center;font-size:13px}
     .surat .spacer{height:70px}
@@ -764,9 +783,7 @@ function renderPreview(app){
           <div class="p" style="margin-top:18px">${escapeHtml(penutupRetribusi)}</div>
         `}
 
-        <div class="p" style="text-align:right;margin-top:12px">
-          Jakarta, ${escapeHtml(ymdToIndo(doc.tanggalTTD))}
-        </div>
+        <div class="dateLine">Jakarta, ${escapeHtml(ymdToIndo(doc.tanggalTTD))}</div>
 
         <div class="ttdgrid">
           <div class="ttd">
@@ -830,7 +847,10 @@ function renderSuratSectionsWithSubtotal(doc){
       </table>
 
       <div class="subline">
-        <span class="left">Subtotal ${escapeHtml(s.title)} -----</span>
+        <div class="left">
+          <span class="text">Subtotal ${escapeHtml(s.title)}</span>
+          <span class="dash"></span>
+        </div>
         <span class="right">${rupiah(sub)}</span>
       </div>
     `);
