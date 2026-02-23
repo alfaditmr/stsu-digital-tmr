@@ -14,8 +14,18 @@
       --accent:#2563eb;
       --accent2:#0ea5e9;
       --danger:#ef4444;
-      --shadow:0 10px 30px rgba(2,6,23,.08);
+      --ok:#16a34a;
+      --shadow:0 12px 35px rgba(2,6,23,.10);
       --radius:16px;
+
+      /* Lebar area dokumen untuk A4 preview */
+      --docw: 760px;
+
+      /* Kolom dokumen: label kiri & nominal kanan */
+      --col-left: 1fr;
+      --col-right: 220px; /* item nominal kolom */
+      --col-sub: 260px;   /* kolom untuk "Subtotal .... -----" (lebih lebar) */
+      --col-sub-amt: 220px; /* kolom subtotal nominal (rata kanan) */
     }
     *{box-sizing:border-box}
     body{
@@ -26,7 +36,7 @@
     }
     .topbar{
       position:sticky; top:0; z-index:50;
-      background:rgba(255,255,255,.9);
+      background:rgba(255,255,255,.92);
       backdrop-filter:saturate(180%) blur(10px);
       border-bottom:1px solid var(--line);
     }
@@ -38,22 +48,16 @@
       align-items:center;
       gap:12px;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px; min-width:0;
-    }
+    .brand{display:flex; align-items:center; gap:10px; min-width:0;}
     .logo{
       width:38px; height:38px; border-radius:14px;
       background:linear-gradient(135deg,var(--accent),var(--accent2));
       display:grid; place-items:center;
-      color:#fff; font-weight:800;
+      color:#fff; font-weight:900;
       flex:0 0 auto;
     }
-    .brand h1{
-      margin:0; font-size:16px; line-height:1.2;
-    }
-    .brand p{
-      margin:0; font-size:12px; color:var(--muted);
-    }
+    .brand h1{margin:0; font-size:16px; line-height:1.2;}
+    .brand p{margin:0; font-size:12px; color:var(--muted);}
     .spacer{flex:1}
     .pill{
       border:1px solid var(--line);
@@ -62,19 +66,31 @@
       border-radius:999px;
       font-size:12px;
       color:var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
     }
+    .pill .dot{
+      width:10px;height:10px;border-radius:99px;
+      background:#cbd5e1;
+    }
+    .pill.ok .dot{background:var(--ok)}
     .btn{
       border:1px solid var(--line);
       background:#fff;
       padding:10px 12px;
       border-radius:12px;
-      font-weight:600;
+      font-weight:700;
       cursor:pointer;
     }
     .btn.primary{
       border-color:transparent;
       background:var(--accent);
       color:#fff;
+    }
+    .btn.ghost{
+      background:#fff;
     }
     .btn.danger{
       border-color:transparent;
@@ -83,20 +99,20 @@
     }
     .btn:active{transform:translateY(1px)}
     .hamburger{
-      width:42px; height:42px;
-      border-radius:12px;
+      width:44px; height:44px;
+      border-radius:14px;
       display:grid; place-items:center;
     }
     .hamburger svg{width:22px;height:22px}
     .drawer-backdrop{
       position:fixed; inset:0;
-      background:rgba(2,6,23,.35);
+      background:rgba(2,6,23,.38);
       display:none;
       z-index:80;
     }
     .drawer{
-      position:fixed; top:0; right:-320px;
-      width:320px; max-width:90vw;
+      position:fixed; top:0; right:-340px;
+      width:340px; max-width:92vw;
       height:100%;
       background:#fff;
       border-left:1px solid var(--line);
@@ -108,16 +124,17 @@
     }
     .drawer.open{right:0}
     .drawer-backdrop.open{display:block}
+
     .navlink{
       display:flex; align-items:center; justify-content:space-between;
       padding:12px;
       border:1px solid var(--line);
-      border-radius:14px;
+      border-radius:16px;
       background:#fff;
       cursor:pointer;
-      font-weight:700;
+      font-weight:900;
     }
-    .navlink small{color:var(--muted); font-weight:600}
+    .navlink small{color:var(--muted); font-weight:700}
     .container{
       max-width:1100px;
       margin:0 auto;
@@ -125,10 +142,10 @@
     }
     .grid{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: 1.15fr .85fr;
       gap:14px;
     }
-    @media (max-width: 900px){
+    @media (max-width: 980px){
       .grid{grid-template-columns:1fr}
     }
     .card{
@@ -143,15 +160,11 @@
       font-size:22px;
       letter-spacing:-.02em;
     }
-    .sub{margin:0 0 14px 0; color:var(--muted)}
-    .row{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    }
-    .field{
-      display:flex; flex-direction:column; gap:6px; width:100%;
-    }
-    label{font-size:12px; color:var(--muted); font-weight:700}
-    input{
+    .sub{margin:0 0 14px 0; color:var(--muted); line-height:1.4}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .field{display:flex; flex-direction:column; gap:6px; width:100%;}
+    label{font-size:12px; color:var(--muted); font-weight:900}
+    input, select, textarea{
       width:100%;
       padding:12px 12px;
       border-radius:12px;
@@ -160,11 +173,12 @@
       background:#fff;
       font-size:14px;
     }
-    input:focus{border-color:rgba(37,99,235,.45); box-shadow:0 0 0 4px rgba(37,99,235,.12)}
-    .note{
-      font-size:12px; color:var(--muted);
-      line-height:1.5;
+    textarea{min-height:80px; resize:vertical}
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(37,99,235,.45);
+      box-shadow:0 0 0 4px rgba(37,99,235,.12)
     }
+    .note{font-size:12px; color:var(--muted); line-height:1.5;}
     .badge{
       display:inline-flex; align-items:center; gap:8px;
       padding:6px 10px; border-radius:999px;
@@ -172,10 +186,224 @@
       background:#fff;
       font-size:12px;
       color:var(--muted);
-      font-weight:700;
+      font-weight:900;
     }
     .badge strong{color:var(--text)}
     .hidden{display:none !important}
+
+    /* Tabs/page */
+    .page{display:none}
+    .page.active{display:block}
+
+    /* Section builder */
+    .sec{
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+      margin-top:10px;
+    }
+    .sec-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 12px;
+      background:#fbfdff;
+      border-bottom:1px solid var(--line);
+      gap:10px;
+    }
+    .sec-head .left{
+      display:flex; flex-direction:column; gap:3px;
+      min-width:0;
+    }
+    .sec-head .left .name{font-weight:1000}
+    .sec-head .left .hint{font-size:12px;color:var(--muted);font-weight:700}
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      font-weight:900;
+      color:var(--muted);
+      user-select:none;
+    }
+    .switch{
+      width:52px;height:30px;border-radius:999px;
+      background:#e2e8f0;
+      position:relative;
+      cursor:pointer;
+      border:1px solid var(--line);
+      flex:0 0 auto;
+    }
+    .switch::after{
+      content:"";
+      width:24px;height:24px;border-radius:50%;
+      background:#fff;
+      position:absolute; top:2px; left:2px;
+      box-shadow:0 6px 16px rgba(2,6,23,.18);
+      transition: left .15s ease, background .15s ease;
+    }
+    .switch.on{background:#16a34a}
+    .switch.on::after{left:26px}
+    .sec-body{padding:12px}
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 8px;
+    }
+    .tr{
+      display:grid;
+      grid-template-columns: 1fr 170px 90px;
+      gap:8px;
+      align-items:center;
+    }
+    .tr .cell input{padding:10px 10px; border-radius:12px}
+    .mini{padding:10px 10px; border-radius:12px}
+    .btn.small{padding:9px 10px; border-radius:12px; font-size:13px}
+    .btn.red{background:var(--danger); color:#fff; border-color:transparent}
+    .btn.gray{background:#fff; border-color:var(--line); color:var(--text)}
+    .sec-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+
+    /* Document preview (A4-like) */
+    .doc-wrap{display:flex; justify-content:center}
+    .doc{
+      width: min(100%, var(--docw));
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      padding:20px 24px;
+    }
+    .doc h2{
+      margin:2px 0 2px;
+      text-align:center;
+      font-size:16px;
+      letter-spacing:.08em;
+    }
+    .doc .docno{
+      text-align:center;
+      font-size:12px;
+      margin:0 0 14px 0;
+      color:var(--text);
+    }
+    .doc .hr{height:1px;background:var(--line);margin:12px 0}
+    .doc .sec-title{
+      font-weight:900;
+      font-size:12.5px;
+      margin:10px 0 6px;
+    }
+    .doc .rows{
+      border-top:1px solid var(--line);
+    }
+    .doc .rowline{
+      display:grid;
+      grid-template-columns: var(--col-left) var(--col-right);
+      gap:10px;
+      padding:6px 0;         /* lebih rapat biar max 2 lembar */
+      border-bottom:1px solid var(--line);
+      font-size:12px;
+    }
+    .doc .rowline .left{
+      padding-left:2px;
+    }
+    .doc .rowline .amt{
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    /* Subtotal row: label + garis nempel + nilai rata kanan sejajar (satu baris) */
+    .doc .subline{
+      display:grid;
+      grid-template-columns: var(--col-left) var(--col-right);
+      gap:10px;
+      padding:6px 0;
+      font-size:12px;
+      align-items:center;
+    }
+    .doc .subline .subwrap{
+      display:flex;
+      justify-content:flex-end; /* posisi subtotal lebih kanan */
+      gap:8px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .doc .subline .subwrap .dash{
+      letter-spacing:.08em;
+    }
+    .doc .subline .subamt{
+      text-align:right;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+
+    .doc .grand{
+      margin-top:10px;
+      border-top:2px solid var(--text);
+      padding-top:10px;
+      display:grid;
+      grid-template-columns: 1fr 220px;
+      gap:10px;
+      align-items:center;
+      font-size:12px;
+    }
+    .doc .grand .gt{font-weight:1000; letter-spacing:.02em}
+    .doc .grand .ga{text-align:right; font-weight:1000; white-space:nowrap}
+    .doc .terbilang{
+      margin-top:6px;
+      font-size:12px;
+      display:grid;
+      grid-template-columns: 80px 1fr;
+      gap:8px;
+    }
+    .doc .terbilang b{white-space:nowrap}
+    .doc .penutup{
+      margin-top:14px; /* lebih berjarak kebawah */
+      font-size:12px;
+      line-height:1.5;
+    }
+    .doc .ttd{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:20px;
+      font-size:12px;
+    }
+    .doc .ttd .box{text-align:center}
+    .doc .ttd .line{
+      margin-top:42px;
+      font-weight:1000;
+      text-decoration:underline;
+    }
+
+    /* Dashboard table */
+    .list{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .list .head, .list .item{
+      display:grid;
+      grid-template-columns: 150px 110px 1fr 140px 90px;
+      gap:10px;
+      padding:10px 12px;
+      align-items:center;
+      font-size:12px;
+    }
+    .list .head{
+      background:#fbfdff;
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+      font-weight:1000;
+    }
+    .list .item{border-bottom:1px solid var(--line)}
+    .list .item:last-child{border-bottom:none}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+    .right{text-align:right}
+    .link{color:var(--accent); font-weight:900; cursor:pointer}
+    @media (max-width: 900px){
+      .list .head, .list .item{
+        grid-template-columns: 1fr 90px;
+        grid-auto-rows:auto;
+      }
+      .list .head div:nth-child(n+3){display:none}
+    }
   </style>
 </head>
 
@@ -193,7 +421,7 @@
 
       <div class="spacer"></div>
 
-      <span id="pillStatus" class="pill">Belum login</span>
+      <span id="pillStatus" class="pill"><span class="dot"></span><span>Belum login</span></span>
 
       <button class="btn hamburger" id="btnHamburger" title="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -207,28 +435,22 @@
   <div id="drawerBackdrop" class="drawer-backdrop"></div>
   <aside id="drawer" class="drawer" aria-hidden="true">
     <div class="row" style="justify-content:space-between">
-      <div style="font-weight:900;font-size:14px">Menu</div>
+      <div style="font-weight:1000;font-size:14px">Menu</div>
       <button class="btn" id="btnCloseDrawer">Tutup</button>
     </div>
 
     <div class="navlink" id="navDashboard">
-      <div>
-        Dashboard<br><small>Ringkasan pendapatan</small>
-      </div>
+      <div>Dashboard<br><small>Ringkasan pendapatan</small></div>
       <span>›</span>
     </div>
 
     <div class="navlink" id="navBuat">
-      <div>
-        Buat STSU<br><small>Input + preview PDF</small>
-      </div>
+      <div>Buat STSU<br><small>Input + preview A4</small></div>
       <span>›</span>
     </div>
 
     <div class="navlink hidden" id="navSettings">
-      <div>
-        Settings (Admin)<br><small>Kategori & template</small>
-      </div>
+      <div>Settings (Admin)<br><small>Template section & ttd</small></div>
       <span>›</span>
     </div>
 
@@ -244,58 +466,279 @@
 
   <!-- CONTENT -->
   <main class="container">
-    <div class="grid">
-      <!-- LOGIN CARD -->
-      <section class="card" id="cardLogin">
-        <h2 class="title">Login</h2>
-        <p class="sub">Masuk pakai akun Firebase (Email/Password).</p>
 
-        <div class="field">
-          <label>Email</label>
-          <input id="loginEmail" type="email" placeholder="email@tmr.go.id" autocomplete="username" />
-        </div>
+    <!-- PAGE: LOGIN -->
+    <section class="page active" id="pageLogin">
+      <div class="grid">
+        <section class="card">
+          <h2 class="title">Login</h2>
+          <p class="sub">Masuk pakai akun Firebase (Email/Password).</p>
 
-        <div style="height:10px"></div>
+          <div class="field">
+            <label>Email</label>
+            <input id="loginEmail" type="email" placeholder="email@tmr.go.id" autocomplete="username" />
+          </div>
 
-        <div class="field">
-          <label>Password</label>
-          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
-        </div>
+          <div style="height:10px"></div>
 
-        <div style="height:12px"></div>
+          <div class="field">
+            <label>Password</label>
+            <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
+          </div>
 
-        <div class="row">
-          <button class="btn primary" id="btnLogin">Login</button>
-          <button class="btn" id="btnForgot">Lupa Password</button>
-        </div>
+          <div style="height:12px"></div>
 
-        <div style="height:10px"></div>
-        <div class="note" id="loginMsg"></div>
-      </section>
+          <div class="row">
+            <button class="btn primary" id="btnLogin">Login</button>
+            <button class="btn" id="btnForgot">Lupa Password</button>
+          </div>
 
-      <!-- STATUS CARD -->
-      <section class="card" id="cardStatus">
-        <h2 class="title">Status</h2>
-        <p class="sub">Info user & akses.</p>
+          <div style="height:10px"></div>
+          <div class="note" id="loginMsg"></div>
+        </section>
 
-        <div class="row">
-          <span class="badge" id="statusAuth">Auth: <strong>-</strong></span>
-          <span class="badge" id="statusUid">UID: <strong>-</strong></span>
-        </div>
-        <div style="height:10px"></div>
-        <div class="row">
-          <span class="badge" id="statusEmail">Email: <strong>-</strong></span>
-          <span class="badge" id="statusRole">Role: <strong>-</strong></span>
-        </div>
+        <section class="card">
+          <h2 class="title">Status</h2>
+          <p class="sub">Info user & akses.</p>
 
-        <div style="height:14px"></div>
-        <div class="note">
-          Setelah login berhasil, menu <b>Settings</b> akan muncul otomatis jika role = <b>admin</b>.
-          <br><br>
-          Next: kita tambah halaman <b>Buat STSU</b> + <b>Dashboard</b> + simpan data ke RTDB.
-        </div>
-      </section>
-    </div>
+          <div class="row">
+            <span class="badge" id="statusAuth">Auth: <strong>-</strong></span>
+            <span class="badge" id="statusUid">UID: <strong>-</strong></span>
+          </div>
+          <div style="height:10px"></div>
+          <div class="row">
+            <span class="badge" id="statusEmail">Email: <strong>-</strong></span>
+            <span class="badge" id="statusRole">Role: <strong>-</strong></span>
+          </div>
+
+          <div style="height:14px"></div>
+          <div class="note">
+            Setelah login, kamu bisa langsung buat STSU dan simpan ke RTDB.
+            <br><br>
+            <b>Nomor STSU</b> otomatis berdasarkan <b>Tanggal Transaksi</b> (counter reset per tahun dan beda untuk Retribusi/Lainnya).
+            <br>
+            <b>Tanggal STSU/TTD</b> bisa diisi belakangan (draft).
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- PAGE: BUAT STSU -->
+    <section class="page" id="pageBuat">
+      <div class="grid">
+        <section class="card">
+          <div class="row" style="justify-content:space-between; align-items:flex-start">
+            <div>
+              <h2 class="title">Buat STSU</h2>
+              <p class="sub">Isi transaksi → nomor STSU otomatis → preview A4. Simpan sebagai draft dulu, tanggal STSU bisa diisi belakangan.</p>
+            </div>
+            <span class="badge" id="badgeDraft">Status: <strong>DRAFT</strong></span>
+          </div>
+
+          <div class="row">
+            <div class="field" style="flex:1; min-width:220px">
+              <label>Jenis STSU</label>
+              <select id="jenis">
+                <option value="RETRIBUSI">Pendapatan Retribusi</option>
+                <option value="LAINNYA">Pendapatan Lainnya</option>
+              </select>
+            </div>
+
+            <div class="field" style="flex:1; min-width:220px">
+              <label>Tanggal Transaksi (untuk nomor STSU)</label>
+              <input id="tglTransaksi" type="date" />
+            </div>
+
+            <div class="field" style="flex:1; min-width:220px">
+              <label>Tanggal STSU/TTD (boleh kosong dulu)</label>
+              <input id="tglStsu" type="date" />
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="note">
+            Nomor STSU format:
+            <b class="mono">No. [URUT]/[TGL]/[BLN]/SU/[TAHUN]</b> untuk Retribusi,
+            dan <b class="mono">No. [URUT]/[TGL]/[BLN]/SU/L/[TAHUN]</b> untuk Lainnya.
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="row">
+            <button class="btn primary" id="btnGenerateNo">Buat / Refresh Nomor</button>
+            <button class="btn" id="btnSimpanDraft">Simpan Draft</button>
+            <button class="btn" id="btnPrint">Print / Save PDF</button>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="badge">Nomor STSU: <strong class="mono" id="noStsuText">-</strong></div>
+
+          <div style="height:14px"></div>
+
+          <div class="row" style="justify-content:space-between">
+            <div class="note"><b>Section:</b> tampil semua. Kamu bisa matikan jika tidak dipakai.</div>
+            <button class="btn" id="btnAddCustomSection">+ Tambah Section Baru</button>
+          </div>
+
+          <div id="sections"></div>
+
+          <div style="height:12px"></div>
+          <div class="note" id="saveMsg"></div>
+        </section>
+
+        <section class="card">
+          <h2 class="title">Preview A4</h2>
+          <p class="sub">Layout dibuat rapat supaya maksimal 2 lembar. Subtotal rata kanan “nempel”.</p>
+
+          <div class="doc-wrap">
+            <div class="doc" id="docPrint">
+              <h2>SURAT TANDA SETOR UANG</h2>
+              <div class="docno">No: <span class="mono" id="docNo">-</span></div>
+
+              <div id="docBody"></div>
+
+              <div class="grand">
+                <div class="gt">JUMLAH TOTAL</div>
+                <div class="ga" id="docGrand">Rp 0</div>
+              </div>
+
+              <div class="terbilang">
+                <b>Terbilang</b>
+                <div>: <span id="docTerbilang">-</span></div>
+              </div>
+
+              <div class="penutup" id="docPenutup" style="display:none"></div>
+
+              <div class="ttd">
+                <div class="box">
+                  <div id="docLeftTitle">Kepala Seksi Pelayanan &amp; Informasi</div>
+                  <div class="line" id="docLeftName">NAMA KEPALA SEKSI</div>
+                </div>
+                <div class="box">
+                  <div id="docRightCityDate">Jakarta, <span id="docTtdDate">..............</span></div>
+                  <div id="docRightTitle">Bendahara Penerimaan</div>
+                  <div class="line" id="docRightName">NAMA BENDAHARA</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="note">
+            Tips: di browser Android, pilih Paper size <b>A4</b> saat Save as PDF.
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- PAGE: DASHBOARD -->
+    <section class="page" id="pageDashboard">
+      <div class="grid">
+        <section class="card">
+          <h2 class="title">Dashboard</h2>
+          <p class="sub">Filter berdasarkan bulan/tanggal transaksi (untuk nomor STSU). Ini ringkasan cepat, nanti bisa kita buat lebih kaya.</p>
+
+          <div class="row">
+            <div class="field" style="flex:1; min-width:220px">
+              <label>Bulan (Transaksi)</label>
+              <input id="dashMonth" type="month" />
+            </div>
+            <div class="field" style="flex:1; min-width:220px">
+              <label>Jenis</label>
+              <select id="dashJenis">
+                <option value="ALL">Semua</option>
+                <option value="RETRIBUSI">Retribusi</option>
+                <option value="LAINNYA">Lainnya</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1; min-width:220px">
+              <label>&nbsp;</label>
+              <button class="btn primary" id="btnDashLoad">Muat Data</button>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="row">
+            <span class="badge">Total Retribusi: <strong id="sumRetr">Rp 0</strong></span>
+            <span class="badge">Total Lainnya: <strong id="sumLain">Rp 0</strong></span>
+            <span class="badge">Grand: <strong id="sumAll">Rp 0</strong></span>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="list">
+            <div class="head">
+              <div>Tgl Transaksi</div>
+              <div>Jenis</div>
+              <div>Nomor</div>
+              <div class="right">Total</div>
+              <div>Aksi</div>
+            </div>
+            <div id="dashList"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="title">Catatan</h2>
+          <p class="sub">Data tersimpan di RTDB. Nomor STSU dihitung saat kamu “Buat/Refresh Nomor” pertama kali untuk transaksi tersebut.</p>
+          <div class="note">
+            Next upgrade:
+            <ul>
+              <li>Dashboard per section (pie/barchart)</li>
+              <li>Export rekap per hari/bulan</li>
+              <li>Tambah fitur “Draft → Final” (lock data)</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- PAGE: SETTINGS -->
+    <section class="page" id="pageSettings">
+      <div class="grid">
+        <section class="card">
+          <h2 class="title">Settings (Admin)</h2>
+          <p class="sub">Ganti nama penandatangan + template section (permanen). Semua tersimpan di RTDB.</p>
+
+          <div class="row">
+            <div class="field" style="flex:1; min-width:260px">
+              <label>Nama Kepala Seksi</label>
+              <input id="setKasi" placeholder="Contoh: Afriana Pulungan, S.Si. MAP" />
+            </div>
+            <div class="field" style="flex:1; min-width:260px">
+              <label>Nama Bendahara Penerimaan</label>
+              <input id="setBend" placeholder="Contoh: Evi Irmawati" />
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="row">
+            <button class="btn primary" id="btnSaveSettings">Simpan Settings</button>
+            <button class="btn" id="btnResetTemplate">Reset Template Default</button>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="note" id="settingsMsg"></div>
+        </section>
+
+        <section class="card">
+          <h2 class="title">Template Section</h2>
+          <p class="sub">Kamu bisa tambah/hapus kategori permanen supaya tampilan awal tidak kepanjangan.</p>
+
+          <div class="note" style="margin-bottom:10px">
+            Format: Section punya daftar kategori default. User tetap bisa tambah baris manual.
+          </div>
+
+          <div id="templateEditor"></div>
+
+          <div style="height:10px"></div>
+          <button class="btn" id="btnAddTemplateSection">+ Tambah Template Section</button>
+        </section>
+      </div>
+    </section>
+
   </main>
 
   <script type="module">
@@ -311,7 +754,15 @@
     import {
       getDatabase,
       ref,
-      get
+      get,
+      set,
+      update,
+      push,
+      child,
+      query,
+      orderByChild,
+      startAt,
+      endAt
     } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
     // === CONFIG kamu ===
@@ -329,12 +780,59 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // === UI refs ===
+    // === Helpers ===
     const $ = (id) => document.getElementById(id);
+    const fmtID = new Intl.NumberFormat("id-ID");
+    const fmtRp = (n) => "Rp " + fmtID.format(Math.round(n||0));
 
+    function parseNominal(v){
+      if (v == null) return 0;
+      const s = String(v).replace(/[^\d]/g,'');
+      return s ? Number(s) : 0;
+    }
+
+    function isoToDMY(iso){
+      if (!iso) return "";
+      const [y,m,d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function getDayNameID(iso){
+      if (!iso) return "";
+      const dt = new Date(iso + "T00:00:00");
+      const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      return days[dt.getDay()];
+    }
+
+    // Terbilang Indonesia (cukup untuk rupiah)
+    function terbilang(n){
+      n = Math.floor(Number(n||0));
+      if (n === 0) return "nol rupiah";
+      const satuan = ["","satu","dua","tiga","empat","lima","enam","tujuh","delapan","sembilan","sepuluh","sebelas"];
+      function toWords(x){
+        x = Math.floor(x);
+        if (x < 12) return satuan[x];
+        if (x < 20) return toWords(x-10) + " belas";
+        if (x < 100) return toWords(Math.floor(x/10)) + " puluh" + (x%10? " " + toWords(x%10):"");
+        if (x < 200) return "seratus" + (x-100? " " + toWords(x-100):"");
+        if (x < 1000) return toWords(Math.floor(x/100)) + " ratus" + (x%100? " " + toWords(x%100):"");
+        if (x < 2000) return "seribu" + (x-1000? " " + toWords(x-1000):"");
+        if (x < 1_000_000) return toWords(Math.floor(x/1000)) + " ribu" + (x%1000? " " + toWords(x%1000):"");
+        if (x < 1_000_000_000) return toWords(Math.floor(x/1_000_000)) + " juta" + (x%1_000_000? " " + toWords(x%1_000_000):"");
+        if (x < 1_000_000_000_000) return toWords(Math.floor(x/1_000_000_000)) + " miliar" + (x%1_000_000_000? " " + toWords(x%1_000_000_000):"");
+        return toWords(Math.floor(x/1_000_000_000_000)) + " triliun" + (x%1_000_000_000_000? " " + toWords(x%1_000_000_000_000):"");
+      }
+      return (toWords(n) + " rupiah").replace(/\s+/g," ").trim();
+    }
+
+    function setMsg(el, text, type="muted"){
+      el.textContent = text || "";
+      el.style.color = type==="ok" ? "var(--ok)" : (type==="err" ? "var(--danger)" : "var(--muted)");
+    }
+
+    // === Drawer ===
     const drawer = $("drawer");
     const drawerBackdrop = $("drawerBackdrop");
-
     function openDrawer(){
       drawer.classList.add("open");
       drawerBackdrop.classList.add("open");
@@ -345,64 +843,898 @@
       drawerBackdrop.classList.remove("open");
       drawer.setAttribute("aria-hidden","true");
     }
-
     $("btnHamburger").addEventListener("click", openDrawer);
     $("btnCloseDrawer").addEventListener("click", closeDrawer);
     drawerBackdrop.addEventListener("click", closeDrawer);
 
-    function setMsg(text, ok=false){
-      $("loginMsg").textContent = text || "";
-      $("loginMsg").style.color = ok ? "#16a34a" : "#64748b";
-      if (!ok && text) $("loginMsg").style.color = "#ef4444";
+    // === Pages ===
+    const pages = ["pageLogin","pageDashboard","pageBuat","pageSettings"];
+    function showPage(id){
+      pages.forEach(p => $(p).classList.toggle("active", p===id));
+      closeDrawer();
+      // refresh preview setiap buka Buat STSU
+      if (id === "pageBuat") renderAll();
+      if (id === "pageSettings") renderTemplateEditor();
+    }
+    $("navDashboard").addEventListener("click", () => showPage("pageDashboard"));
+    $("navBuat").addEventListener("click", () => showPage("pageBuat"));
+    $("navSettings").addEventListener("click", () => showPage("pageSettings"));
+
+    // === Auth UI refs ===
+    const pill = $("pillStatus");
+    function setPill(ok, text){
+      pill.classList.toggle("ok", !!ok);
+      pill.querySelector(".dot").style.background = ok ? "var(--ok)" : "#cbd5e1";
+      pill.querySelector("span:last-child").textContent = text;
     }
 
-    function setStatusPill(text){
-      $("pillStatus").textContent = text;
-    }
-
-    function setHidden(id, hide){
-      $(id).classList.toggle("hidden", !!hide);
-    }
-
-    async function getRole(uid){
-      // role disimpan di: /users/{uid}/role
+    async function getUserProfile(uid){
       const snap = await get(ref(db, `users/${uid}`));
-      if (!snap.exists()) return { role: "user", name: "-" };
+      if (!snap.exists()) return { role:"user", name:"-" };
       const v = snap.val() || {};
       return { role: v.role || "user", name: v.name || "-" };
     }
+
+    // === Settings in RTDB ===
+    // /config/signers => { kasiName, bendName, leftTitle, rightTitle }
+    async function loadSigners(){
+      const snap = await get(ref(db, "config/signers"));
+      const def = {
+        leftTitle: "Kepala Seksi Pelayanan & Informasi",
+        rightTitle: "Bendahara Penerimaan",
+        kasiName: "NAMA KEPALA SEKSI",
+        bendName: "NAMA BENDAHARA",
+      };
+      if (!snap.exists()) return def;
+      return { ...def, ...(snap.val()||{}) };
+    }
+
+    // Template section default tersimpan di: /config/templates
+    // { sections: [{ id, name, hint, enabledDefault, items:[{label, amountDefault}] }] }
+    function defaultTemplates(){
+      return {
+        sections: [
+          { id:"fasilitas", name:"Pemakaian Fasilitas", hint:"fleksibel (sesuai pemakaian hari itu)", enabledDefault:true,
+            items:[
+              { label:"Panggung", amountDefault:0 },
+              { label:"Lahan terbuka", amountDefault:0 }
+            ]
+          },
+          { id:"sectionbaru", name:"Section Baru (ubah nama)", hint:"bisa untuk retribusi juru foto / dll", enabledDefault:false,
+            items:[
+              { label:"Juru foto", amountDefault:0 },
+              { label:"Lain-lain", amountDefault:0 }
+            ]
+          },
+          { id:"eticket", name:"E-ticketing", hint:"template sama seperti e-ticketing", enabledDefault:true,
+            items:[
+              { label:"Dewasa", amountDefault:0 },
+              { label:"Anak", amountDefault:0 },
+              { label:"Rombongan Dewasa", amountDefault:0 },
+              { label:"Rombongan Anak", amountDefault:0 },
+              { label:"Taman Satwa Anak", amountDefault:0 },
+
+              // Pusat Primata digabung per request
+              { label:"Pusat Primata Hari Biasa Dewasa", amountDefault:0 },
+              { label:"Pusat Primata Hari Biasa Anak", amountDefault:0 },
+              { label:"Pusat Primata Hari Besar Dewasa", amountDefault:0 },
+              { label:"Pusat Primata Hari Besar Anak", amountDefault:0 },
+
+              { label:"Kendaraan Gol 1", amountDefault:0 },
+              { label:"Kendaraan Gol 2", amountDefault:0 },
+              { label:"Kendaraan Gol 3", amountDefault:0 },
+              { label:"Motor", amountDefault:0 },
+              { label:"Sepeda", amountDefault:0 }
+            ]
+          },
+          { id:"tiketonline", name:"Tiket Online", hint:"template sama seperti tiket online", enabledDefault:true,
+            items:[
+              { label:"Dewasa", amountDefault:0 },
+              { label:"Anak", amountDefault:0 },
+              { label:"Taman Satwa Anak", amountDefault:0 },
+              { label:"Pusat Primata Hari Biasa Dewasa", amountDefault:0 },
+              { label:"Pusat Primata Hari Biasa Anak", amountDefault:0 },
+              { label:"Pusat Primata Hari Besar Dewasa", amountDefault:0 },
+              { label:"Pusat Primata Hari Besar Anak", amountDefault:0 },
+              { label:"Kendaraan Gol 2", amountDefault:0 },
+              { label:"Kendaraan Gol 3", amountDefault:0 },
+              { label:"Motor", amountDefault:0 },
+              { label:"Sepeda", amountDefault:0 }
+            ]
+          },
+          { id:"vending", name:"Vending Machine", hint:"template sama seperti vending", enabledDefault:false,
+            items:[
+              { label:"Dewasa", amountDefault:0 },
+              { label:"Anak", amountDefault:0 }
+            ]
+          },
+          { id:"newgate", name:"New Gate", hint:"template sama seperti new gate", enabledDefault:false,
+            items:[
+              { label:"Dewasa", amountDefault:0 },
+              { label:"Anak", amountDefault:0 },
+              { label:"Kendaraan Gol 1", amountDefault:0 },
+              { label:"Kendaraan Gol 3", amountDefault:0 },
+              { label:"Motor", amountDefault:0 },
+              { label:"Sepeda", amountDefault:0 }
+            ]
+          }
+        ]
+      };
+    }
+
+    async function loadTemplates(){
+      const snap = await get(ref(db, "config/templates"));
+      if (!snap.exists()){
+        const def = defaultTemplates();
+        await set(ref(db, "config/templates"), def);
+        return def;
+      }
+      // Merge minimal safeguard
+      const v = snap.val() || {};
+      if (!Array.isArray(v.sections)) return defaultTemplates();
+      return v;
+    }
+
+    // === STSU STATE ===
+    let currentUser = null;
+    let profile = { role:"user", name:"-" };
+    let signers = null;
+    let templates = null;
+
+    let stsu = {
+      id: null,              // key di RTDB (draft id)
+      jenis: "RETRIBUSI",     // RETRIBUSI / LAINNYA
+      tglTransaksi: "",      // ISO
+      tglStsu: "",           // ISO optional
+      noStsu: "",            // string
+      sections: []           // built from templates: [{id,name,enabled,items:[{label,amount}]}]
+    };
+
+    function buildSectionsFromTemplates(){
+      stsu.sections = templates.sections.map(s => ({
+        id: s.id,
+        name: s.name,
+        hint: s.hint || "",
+        enabled: !!s.enabledDefault,
+        items: (s.items || []).map(it => ({ label: it.label || "", amount: it.amountDefault || 0 }))
+      }));
+    }
+
+    function ensureLoaded(){
+      if (!templates) return false;
+      if (!signers) return false;
+      return true;
+    }
+
+    // === Numbering logic ===
+    // counter path:
+    // /counters/{jenis}/{year}/next => integer
+    // nomor dibentuk dari urut + tgl + bln + SU + [L] + year
+    async function generateNoStsu(jenis, tglTransaksiISO){
+      if (!tglTransaksiISO) throw new Error("Tanggal transaksi wajib diisi.");
+      const [y,m,d] = tglTransaksiISO.split("-");
+      const year = y;
+
+      const jenisKey = (jenis === "LAINNYA") ? "lainnya" : "retribusi";
+      const counterRef = ref(db, `counters/${jenisKey}/${year}/next`);
+      const snap = await get(counterRef);
+      let next = 1;
+      if (snap.exists()){
+        next = Number(snap.val() || 1);
+      }
+      // pakai urutan sekarang sebagai nomor, lalu increment next
+      const urut = next;
+      await set(counterRef, urut + 1);
+
+      const tgl = String(Number(d)).padStart(2,"0");
+      const bln = String(Number(m)).padStart(2,"0");
+
+      // format sesuai request
+      // Retribusi: urut/tgl/bln/SU/year
+      // Lainnya:  urut/tgl/bln/SU/L/year
+      const no = (jenis === "LAINNYA")
+        ? `${urut}/${tgl}/${bln}/SU/L/${year}`
+        : `${urut}/${tgl}/${bln}/SU/${year}`;
+
+      return no;
+    }
+
+    // === UI: build section editor ===
+    function makeSwitch(on){
+      const sw = document.createElement("div");
+      sw.className = "switch" + (on ? " on" : "");
+      return sw;
+    }
+
+    function renderSections(){
+      const root = $("sections");
+      root.innerHTML = "";
+
+      stsu.sections.forEach((s, sIdx) => {
+        const sec = document.createElement("div");
+        sec.className = "sec";
+
+        const head = document.createElement("div");
+        head.className = "sec-head";
+
+        const left = document.createElement("div");
+        left.className = "left";
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = s.name;
+
+        const hint = document.createElement("div");
+        hint.className = "hint";
+        hint.textContent = s.hint || "";
+
+        left.appendChild(name);
+        left.appendChild(hint);
+
+        const tog = document.createElement("div");
+        tog.className = "toggle";
+        const sw = makeSwitch(s.enabled);
+        const lab = document.createElement("div");
+        lab.textContent = s.enabled ? "Aktif" : "Nonaktif";
+
+        sw.addEventListener("click", () => {
+          s.enabled = !s.enabled;
+          renderAll();
+        });
+
+        tog.appendChild(lab);
+        tog.appendChild(sw);
+
+        head.appendChild(left);
+        head.appendChild(tog);
+
+        const body = document.createElement("div");
+        body.className = "sec-body";
+        body.style.display = s.enabled ? "block" : "none";
+
+        // table rows
+        const rows = document.createElement("div");
+        rows.style.display = "flex";
+        rows.style.flexDirection = "column";
+        rows.style.gap = "8px";
+
+        s.items.forEach((it, iIdx) => {
+          const tr = document.createElement("div");
+          tr.className = "tr";
+
+          const c1 = document.createElement("div");
+          c1.className = "cell";
+          const inpLabel = document.createElement("input");
+          inpLabel.placeholder = "Kategori";
+          inpLabel.value = it.label || "";
+          inpLabel.addEventListener("input", () => {
+            it.label = inpLabel.value;
+            renderDocOnly();
+          });
+          c1.appendChild(inpLabel);
+
+          const c2 = document.createElement("div");
+          c2.className = "cell";
+          const inpAmt = document.createElement("input");
+          inpAmt.placeholder = "Nominal";
+          inpAmt.inputMode = "numeric";
+          inpAmt.value = it.amount ? String(it.amount) : "";
+          inpAmt.addEventListener("input", () => {
+            it.amount = parseNominal(inpAmt.value);
+            inpAmt.value = it.amount ? fmtID.format(it.amount) : "";
+            renderDocOnly();
+          });
+          c2.appendChild(inpAmt);
+
+          const c3 = document.createElement("div");
+          c3.className = "cell";
+          const btnDel = document.createElement("button");
+          btnDel.className = "btn small red";
+          btnDel.textContent = "Hapus";
+          btnDel.addEventListener("click", () => {
+            s.items.splice(iIdx, 1);
+            renderAll();
+          });
+          c3.appendChild(btnDel);
+
+          tr.appendChild(c1);
+          tr.appendChild(c2);
+          tr.appendChild(c3);
+
+          rows.appendChild(tr);
+        });
+
+        body.appendChild(rows);
+
+        const actions = document.createElement("div");
+        actions.className = "sec-actions";
+
+        const btnAddRow = document.createElement("button");
+        btnAddRow.className = "btn small gray";
+        btnAddRow.textContent = "+ Tambah baris";
+        btnAddRow.addEventListener("click", () => {
+          s.items.push({ label:"", amount:0 });
+          renderAll();
+        });
+
+        const btnRename = document.createElement("button");
+        btnRename.className = "btn small gray";
+        btnRename.textContent = "Ubah nama section";
+        btnRename.addEventListener("click", () => {
+          const nv = prompt("Nama section:", s.name);
+          if (nv != null && nv.trim()) s.name = nv.trim();
+          renderAll();
+        });
+
+        actions.appendChild(btnAddRow);
+        actions.appendChild(btnRename);
+
+        body.appendChild(actions);
+
+        sec.appendChild(head);
+        sec.appendChild(body);
+
+        root.appendChild(sec);
+      });
+    }
+
+    // === Document render ===
+    function calcSectionTotal(sec){
+      return (sec.items || []).reduce((a,it)=> a + (parseNominal(it.amount)||0), 0);
+    }
+    function calcGrandTotal(){
+      return stsu.sections.filter(s=>s.enabled).reduce((a,s)=> a + calcSectionTotal(s), 0);
+    }
+
+    function makeDocSection(sec){
+      const wrap = document.createElement("div");
+      const title = document.createElement("div");
+      title.className = "sec-title";
+      title.textContent = sec.name;
+      wrap.appendChild(title);
+
+      const rows = document.createElement("div");
+      rows.className = "rows";
+
+      // item lines
+      (sec.items || []).forEach(it => {
+        const label = (it.label || "").trim();
+        const amt = parseNominal(it.amount);
+        if (!label && !amt) return; // kosong ga ditampilkan
+        const line = document.createElement("div");
+        line.className = "rowline";
+
+        const l = document.createElement("div");
+        l.className = "left";
+        l.textContent = label || "-";
+
+        const a = document.createElement("div");
+        a.className = "amt";
+        a.textContent = fmtRp(amt);
+
+        line.appendChild(l);
+        line.appendChild(a);
+        rows.appendChild(line);
+      });
+
+      wrap.appendChild(rows);
+
+      // subtotal line (satu baris, nempel nilai)
+      const subtotal = calcSectionTotal(sec);
+      const sub = document.createElement("div");
+      sub.className = "subline";
+
+      const subLeft = document.createElement("div");
+      subLeft.className = "subwrap";
+      subLeft.style.display = "flex";
+
+      // label + dash dibuat dalam 1 blok, align kanan
+      const label = document.createElement("div");
+      label.textContent = `Subtotal ${sec.name}`;
+      const dash = document.createElement("div");
+      dash.className = "dash";
+      dash.textContent = "-----";
+
+      subLeft.appendChild(label);
+      subLeft.appendChild(dash);
+
+      const subAmt = document.createElement("div");
+      subAmt.className = "subamt";
+      subAmt.textContent = fmtRp(subtotal);
+
+      // posisikan label subtotal lebih kanan
+      sub.appendChild(subLeft);
+      sub.appendChild(subAmt);
+
+      wrap.appendChild(sub);
+
+      return wrap;
+    }
+
+    function renderDocOnly(){
+      // nomor
+      $("docNo").textContent = stsu.noStsu || "-";
+      $("noStsuText").textContent = stsu.noStsu || "-";
+
+      // isi doc
+      const body = $("docBody");
+      body.innerHTML = "";
+
+      stsu.sections.filter(s=>s.enabled).forEach(sec => {
+        body.appendChild(makeDocSection(sec));
+        const hr = document.createElement("div");
+        hr.className = "hr";
+        body.appendChild(hr);
+      });
+
+      const grand = calcGrandTotal();
+      $("docGrand").textContent = fmtRp(grand);
+      $("docTerbilang").textContent = terbilang(grand);
+
+      // tanggal ttd (boleh kosong)
+      const ttdDate = stsu.tglStsu ? isoToDMY(stsu.tglStsu) : "..............";
+      $("docTtdDate").textContent = ttdDate;
+
+      // signers
+      $("docLeftTitle").textContent = signers.leftTitle || "Kepala Seksi Pelayanan & Informasi";
+      $("docRightTitle").textContent = signers.rightTitle || "Bendahara Penerimaan";
+      $("docLeftName").textContent = signers.kasiName || "NAMA KEPALA SEKSI";
+      $("docRightName").textContent = signers.bendName || "NAMA BENDAHARA";
+
+      // penutup khusus Retribusi
+      const penutup = $("docPenutup");
+      if (stsu.jenis === "RETRIBUSI"){
+        const hari = getDayNameID(stsu.tglTransaksi);
+        const dmy = isoToDMY(stsu.tglTransaksi);
+        const no = stsu.noStsu || "-";
+        const total = fmtRp(grand);
+
+        // sesuai contoh: menyebut nomor STSU + nominal
+        penutup.style.display = "block";
+        penutup.textContent =
+          `Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR ` +
+          `pada hari ${hari} tanggal ${dmy} dengan STSU No. ${no} dengan uang sebesar ${total}`;
+      }else{
+        penutup.style.display = "none";
+        penutup.textContent = "";
+      }
+    }
+
+    function renderAll(){
+      // sync header values
+      stsu.jenis = $("jenis").value;
+      stsu.tglTransaksi = $("tglTransaksi").value;
+      stsu.tglStsu = $("tglStsu").value;
+
+      renderSections();
+      renderDocOnly();
+    }
+
+    // === Add custom section (on top of E-ticketing) ===
+    $("btnAddCustomSection").addEventListener("click", () => {
+      // tempatkan di atas E-ticketing (sesuai request)
+      const idxEt = stsu.sections.findIndex(s => s.id === "eticket");
+      const newId = "custom_" + Math.random().toString(16).slice(2);
+      const obj = {
+        id: newId,
+        name: "Section Baru (ubah nama)",
+        hint: "custom (misal retribusi juru foto / dll)",
+        enabled: true,
+        items: [{ label:"", amount:0 }]
+      };
+      if (idxEt >= 0){
+        stsu.sections.splice(idxEt, 0, obj);
+      }else{
+        stsu.sections.unshift(obj);
+      }
+      renderAll();
+    });
+
+    // === Print ===
+    $("btnPrint").addEventListener("click", () => {
+      // simple print
+      window.print();
+    });
+
+    // === Save Draft to RTDB ===
+    // Save structure: /stsu/{id} => {...}
+    // index by date transaksi: /stsuByDate/{YYYY-MM-DD}/{id}: true
+    async function saveDraft(){
+      if (!currentUser) throw new Error("Belum login.");
+      if (!stsu.tglTransaksi) throw new Error("Tanggal transaksi wajib diisi.");
+
+      // ensure nomor sudah ada (kalau belum, generate)
+      if (!stsu.noStsu){
+        stsu.noStsu = await generateNoStsu(stsu.jenis, stsu.tglTransaksi);
+      }
+
+      const grand = calcGrandTotal();
+
+      const payload = {
+        jenis: stsu.jenis,
+        tglTransaksi: stsu.tglTransaksi,
+        tglStsu: stsu.tglStsu || "",
+        noStsu: stsu.noStsu,
+        total: grand,
+        sections: stsu.sections,
+        status: "DRAFT",
+        createdBy: currentUser.uid,
+        updatedAt: Date.now()
+      };
+
+      if (!stsu.id){
+        const newRef = push(ref(db, "stsu"));
+        stsu.id = newRef.key;
+        payload.createdAt = Date.now();
+        await set(newRef, payload);
+      }else{
+        await update(ref(db, `stsu/${stsu.id}`), payload);
+      }
+
+      // index by date
+      await set(ref(db, `stsuByDate/${stsu.tglTransaksi}/${stsu.id}`), true);
+
+      setMsg($("saveMsg"), `Draft tersimpan ✅ (ID: ${stsu.id})`, "ok");
+      $("badgeDraft").querySelector("strong").textContent = "DRAFT";
+      renderDocOnly();
+    }
+
+    $("btnSimpanDraft").addEventListener("click", async () => {
+      try{
+        setMsg($("saveMsg"), "Menyimpan draft...");
+        await saveDraft();
+      }catch(e){
+        setMsg($("saveMsg"), `Gagal simpan: ${e?.message || e}`, "err");
+      }
+    });
+
+    // === Generate/Refresh Number ===
+    $("btnGenerateNo").addEventListener("click", async () => {
+      try{
+        if (!stsu.tglTransaksi) throw new Error("Tanggal transaksi wajib diisi.");
+        // Jika sudah ada nomor dan id draft, biarkan. Kalau mau refresh beneran, kamu bisa clear dulu.
+        if (!stsu.noStsu){
+          stsu.noStsu = await generateNoStsu(stsu.jenis, stsu.tglTransaksi);
+        }
+        renderDocOnly();
+        setMsg($("saveMsg"), "Nomor STSU siap ✅", "ok");
+      }catch(e){
+        setMsg($("saveMsg"), `Gagal buat nomor: ${e?.message || e}`, "err");
+      }
+    });
+
+    // === Dashboard load ===
+    async function loadDashboard(){
+      if (!currentUser) return;
+      const month = $("dashMonth").value; // YYYY-MM
+      const jenis = $("dashJenis").value; // ALL/...
+
+      if (!month){
+        alert("Pilih bulan dulu.");
+        return;
+      }
+      const start = month + "-01";
+      // endAt trick: ambil sampai "YYYY-MM-31"
+      const end = month + "-31";
+
+      // Query stsu ordered by tglTransaksi
+      const qy = query(ref(db, "stsu"), orderByChild("tglTransaksi"), startAt(start), endAt(end));
+      const snap = await get(qy);
+
+      let rows = [];
+      if (snap.exists()){
+        const obj = snap.val();
+        for (const [id, v] of Object.entries(obj)){
+          if (jenis !== "ALL" && v.jenis !== jenis) continue;
+          rows.push({ id, ...v });
+        }
+      }
+
+      // sort by date asc
+      rows.sort((a,b)=> String(a.tglTransaksi||"").localeCompare(String(b.tglTransaksi||"")));
+
+      // sums
+      let sumR=0, sumL=0;
+      rows.forEach(r=>{
+        if (r.jenis === "RETRIBUSI") sumR += Number(r.total||0);
+        else sumL += Number(r.total||0);
+      });
+      $("sumRetr").textContent = fmtRp(sumR);
+      $("sumLain").textContent = fmtRp(sumL);
+      $("sumAll").textContent = fmtRp(sumR+sumL);
+
+      // list
+      const list = $("dashList");
+      list.innerHTML = "";
+      if (!rows.length){
+        const empty = document.createElement("div");
+        empty.className = "item";
+        empty.innerHTML = `<div class="mono">${month}</div><div>-</div><div style="grid-column: span 3; color: var(--muted)">Belum ada data.</div>`;
+        list.appendChild(empty);
+        return;
+      }
+
+      rows.forEach(r=>{
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const tgl = document.createElement("div");
+        tgl.textContent = isoToDMY(r.tglTransaksi || "");
+        tgl.className = "mono";
+
+        const j = document.createElement("div");
+        j.textContent = (r.jenis === "RETRIBUSI") ? "Retribusi" : "Lainnya";
+
+        const no = document.createElement("div");
+        no.textContent = r.noStsu || "-";
+        no.className = "mono";
+
+        const tot = document.createElement("div");
+        tot.textContent = fmtRp(r.total || 0);
+        tot.className = "right";
+
+        const aksi = document.createElement("div");
+        const open = document.createElement("span");
+        open.className = "link";
+        open.textContent = "Buka";
+        open.addEventListener("click", async () => {
+          await openDraft(r.id);
+          showPage("pageBuat");
+        });
+        aksi.appendChild(open);
+
+        div.appendChild(tgl);
+        div.appendChild(j);
+        div.appendChild(no);
+        div.appendChild(tot);
+        div.appendChild(aksi);
+
+        list.appendChild(div);
+      });
+    }
+
+    $("btnDashLoad").addEventListener("click", loadDashboard);
+
+    async function openDraft(id){
+      const snap = await get(ref(db, `stsu/${id}`));
+      if (!snap.exists()){
+        alert("Data tidak ditemukan.");
+        return;
+      }
+      const v = snap.val();
+      stsu.id = id;
+      stsu.jenis = v.jenis || "RETRIBUSI";
+      stsu.tglTransaksi = v.tglTransaksi || "";
+      stsu.tglStsu = v.tglStsu || "";
+      stsu.noStsu = v.noStsu || "";
+      stsu.sections = Array.isArray(v.sections) ? v.sections : stsu.sections;
+
+      // sync form fields
+      $("jenis").value = stsu.jenis;
+      $("tglTransaksi").value = stsu.tglTransaksi;
+      $("tglStsu").value = stsu.tglStsu;
+
+      $("badgeDraft").querySelector("strong").textContent = v.status || "DRAFT";
+      renderAll();
+      setMsg($("saveMsg"), `Draft dibuka ✅ (ID: ${id})`, "ok");
+    }
+
+    // === Settings: save signers ===
+    async function saveSettings(){
+      if (profile.role !== "admin") throw new Error("Hanya admin.");
+      const kasi = $("setKasi").value.trim() || "NAMA KEPALA SEKSI";
+      const bend = $("setBend").value.trim() || "NAMA BENDAHARA";
+
+      const payload = {
+        leftTitle: "Kepala Seksi Pelayanan & Informasi",
+        rightTitle: "Bendahara Penerimaan",
+        kasiName: kasi,
+        bendName: bend
+      };
+      await set(ref(db, "config/signers"), payload);
+      signers = payload;
+      setMsg($("settingsMsg"), "Settings tersimpan ✅", "ok");
+      renderDocOnly();
+    }
+
+    $("btnSaveSettings").addEventListener("click", async () => {
+      try{
+        setMsg($("settingsMsg"), "Menyimpan...");
+        await saveSettings();
+      }catch(e){
+        setMsg($("settingsMsg"), `Gagal: ${e?.message || e}`, "err");
+      }
+    });
+
+    $("btnResetTemplate").addEventListener("click", async () => {
+      try{
+        if (profile.role !== "admin") throw new Error("Hanya admin.");
+        templates = defaultTemplates();
+        await set(ref(db, "config/templates"), templates);
+        buildSectionsFromTemplates();
+        setMsg($("settingsMsg"), "Template di-reset ke default ✅", "ok");
+        renderTemplateEditor();
+        renderAll();
+      }catch(e){
+        setMsg($("settingsMsg"), `Gagal: ${e?.message || e}`, "err");
+      }
+    });
+
+    // === Template Editor ===
+    function renderTemplateEditor(){
+      if (!templates) return;
+      const root = $("templateEditor");
+      root.innerHTML = "";
+
+      templates.sections.forEach((s, idx) => {
+        const c = document.createElement("div");
+        c.className = "sec";
+
+        const h = document.createElement("div");
+        h.className = "sec-head";
+        const left = document.createElement("div");
+        left.className = "left";
+        left.innerHTML = `<div class="name">Template: ${s.name}</div><div class="hint">${s.hint||""}</div>`;
+        const right = document.createElement("div");
+        right.className = "row";
+        right.style.gap = "8px";
+
+        const btnRename = document.createElement("button");
+        btnRename.className = "btn small gray";
+        btnRename.textContent = "Ubah Nama";
+        btnRename.addEventListener("click", () => {
+          const nv = prompt("Nama section:", s.name);
+          if (nv != null && nv.trim()) s.name = nv.trim();
+          renderTemplateEditor();
+        });
+
+        const btnDel = document.createElement("button");
+        btnDel.className = "btn small red";
+        btnDel.textContent = "Hapus";
+        btnDel.addEventListener("click", () => {
+          if (!confirm("Hapus template section ini?")) return;
+          templates.sections.splice(idx, 1);
+          renderTemplateEditor();
+        });
+
+        right.appendChild(btnRename);
+        right.appendChild(btnDel);
+
+        h.appendChild(left);
+        h.appendChild(right);
+
+        const b = document.createElement("div");
+        b.className = "sec-body";
+
+        const list = document.createElement("div");
+        list.style.display = "flex";
+        list.style.flexDirection = "column";
+        list.style.gap = "8px";
+
+        (s.items || []).forEach((it, i) => {
+          const tr = document.createElement("div");
+          tr.className = "tr";
+          tr.style.gridTemplateColumns = "1fr 170px 90px";
+
+          const c1 = document.createElement("div");
+          const inp = document.createElement("input");
+          inp.value = it.label || "";
+          inp.placeholder = "Kategori default";
+          inp.addEventListener("input", () => it.label = inp.value);
+          c1.appendChild(inp);
+
+          const c2 = document.createElement("div");
+          const in2 = document.createElement("input");
+          in2.value = it.amountDefault ? fmtID.format(it.amountDefault) : "";
+          in2.inputMode = "numeric";
+          in2.placeholder = "Default (opsional)";
+          in2.addEventListener("input", () => {
+            it.amountDefault = parseNominal(in2.value);
+            in2.value = it.amountDefault ? fmtID.format(it.amountDefault) : "";
+          });
+          c2.appendChild(in2);
+
+          const c3 = document.createElement("div");
+          const del = document.createElement("button");
+          del.className = "btn small red";
+          del.textContent = "Hapus";
+          del.addEventListener("click", () => {
+            s.items.splice(i, 1);
+            renderTemplateEditor();
+          });
+          c3.appendChild(del);
+
+          tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3);
+          list.appendChild(tr);
+        });
+
+        const btnAdd = document.createElement("button");
+        btnAdd.className = "btn small gray";
+        btnAdd.textContent = "+ Tambah kategori default";
+        btnAdd.addEventListener("click", () => {
+          s.items = s.items || [];
+          s.items.push({ label:"", amountDefault:0 });
+          renderTemplateEditor();
+        });
+
+        const btnSave = document.createElement("button");
+        btnSave.className = "btn small primary";
+        btnSave.textContent = "Simpan Template";
+        btnSave.addEventListener("click", async () => {
+          try{
+            if (profile.role !== "admin") throw new Error("Hanya admin.");
+            await set(ref(db, "config/templates"), templates);
+            // refresh STSU sections from template (tanpa menghapus section custom di draft saat ini)
+            const keepCustom = stsu.sections.filter(x => x.id && String(x.id).startsWith("custom_"));
+            buildSectionsFromTemplates();
+            // re-append custom before eticket
+            const idxEt = stsu.sections.findIndex(s=>s.id==="eticket");
+            keepCustom.forEach(cs=>{
+              if (idxEt>=0) stsu.sections.splice(idxEt, 0, cs);
+              else stsu.sections.unshift(cs);
+            });
+
+            setMsg($("settingsMsg"), "Template tersimpan ✅", "ok");
+            renderAll();
+          }catch(e){
+            setMsg($("settingsMsg"), `Gagal: ${e?.message || e}`, "err");
+          }
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "sec-actions";
+        actions.appendChild(btnAdd);
+        actions.appendChild(btnSave);
+
+        b.appendChild(list);
+        b.appendChild(actions);
+
+        c.appendChild(h);
+        c.appendChild(b);
+
+        root.appendChild(c);
+      });
+    }
+
+    $("btnAddTemplateSection").addEventListener("click", () => {
+      templates.sections.push({
+        id: "tpl_" + Math.random().toString(16).slice(2),
+        name: "Section Baru (ubah nama)",
+        hint: "template section tambahan",
+        enabledDefault: false,
+        items: [{ label:"Lain-lain", amountDefault:0 }]
+      });
+      renderTemplateEditor();
+    });
 
     // === Login handlers ===
     $("btnLogin").addEventListener("click", async () => {
       const email = $("loginEmail").value.trim();
       const pass  = $("loginPass").value;
-
       if (!email || !pass){
-        setMsg("Email dan password wajib diisi.");
+        setMsg($("loginMsg"), "Email dan password wajib diisi.", "err");
         return;
       }
-
-      setMsg("Login...");
+      setMsg($("loginMsg"), "Login...");
       try{
         await signInWithEmailAndPassword(auth, email, pass);
-        setMsg("Login berhasil ✅", true);
+        setMsg($("loginMsg"), "Login berhasil ✅", "ok");
       }catch(e){
-        setMsg(`Gagal login: ${e?.message || e}`);
+        setMsg($("loginMsg"), `Gagal login: ${e?.message || e}`, "err");
       }
     });
 
     $("btnForgot").addEventListener("click", async () => {
       const email = $("loginEmail").value.trim();
       if (!email){
-        setMsg("Isi email dulu untuk reset password.");
+        setMsg($("loginMsg"), "Isi email dulu untuk reset password.", "err");
         return;
       }
-      setMsg("Mengirim email reset...");
+      setMsg($("loginMsg"), "Mengirim email reset...");
       try{
         await sendPasswordResetEmail(auth, email);
-        setMsg("Email reset password terkirim ✅ (cek inbox/spam)", true);
+        setMsg($("loginMsg"), "Email reset password terkirim ✅ (cek inbox/spam)", "ok");
       }catch(e){
-        setMsg(`Gagal kirim reset: ${e?.message || e}`);
+        setMsg($("loginMsg"), `Gagal kirim reset: ${e?.message || e}`, "err");
       }
     });
 
@@ -411,15 +1743,17 @@
       closeDrawer();
     });
 
-    // === Nav (sementara placeholder) ===
-    $("navDashboard").addEventListener("click", () => alert("Next: Dashboard pendapatan (kita buat setelah login beres)"));
-    $("navBuat").addEventListener("click", () => alert("Next: Form Buat STSU + preview PDF (kita sambung setelah login beres)"));
-    $("navSettings").addEventListener("click", () => alert("Next: Settings admin (template/kategori permanen)"));
+    // === On change inputs update preview ===
+    $("jenis").addEventListener("change", () => { stsu.noStsu=""; renderAll(); });
+    $("tglTransaksi").addEventListener("change", () => { stsu.noStsu=""; renderAll(); });
+    $("tglStsu").addEventListener("change", renderAll);
 
-    // === Auth state ===
+    // === Boot ===
     onAuthStateChanged(auth, async (user) => {
       if (!user){
-        setStatusPill("Belum login");
+        currentUser = null;
+        profile = { role:"user", name:"-" };
+        setPill(false, "Belum login");
         $("statusAuth").querySelector("strong").textContent = "OFF";
         $("statusUid").querySelector("strong").textContent = "-";
         $("statusEmail").querySelector("strong").textContent = "-";
@@ -427,29 +1761,55 @@
 
         $("badgeUser").querySelector("strong").textContent = "-";
         $("badgeRole").querySelector("strong").textContent = "-";
+        $("navSettings").classList.add("hidden");
+        $("btnLogout").classList.add("hidden");
 
-        setHidden("btnLogout", true);
-        setHidden("navSettings", true);
+        showPage("pageLogin");
         return;
       }
 
-      setStatusPill("Login ✅");
+      currentUser = user;
+      profile = await getUserProfile(user.uid);
+      setPill(true, "Login ✅");
+
       $("statusAuth").querySelector("strong").textContent = "ON";
       $("statusUid").querySelector("strong").textContent = user.uid;
       $("statusEmail").querySelector("strong").textContent = user.email || "-";
+      $("statusRole").querySelector("strong").textContent = profile.role;
 
-      const { role, name } = await getRole(user.uid);
+      $("badgeUser").querySelector("strong").textContent = profile.name || (user.email || "-");
+      $("badgeRole").querySelector("strong").textContent = profile.role;
 
-      $("statusRole").querySelector("strong").textContent = role;
-      $("badgeUser").querySelector("strong").textContent = name || (user.email || "-");
-      $("badgeRole").querySelector("strong").textContent = role;
+      $("btnLogout").classList.remove("hidden");
 
-      setHidden("btnLogout", false);
+      if (profile.role === "admin") $("navSettings").classList.remove("hidden");
+      else $("navSettings").classList.add("hidden");
 
-      // Tampilkan Settings hanya untuk admin
-      const isAdmin = (role === "admin");
-      setHidden("navSettings", !isAdmin);
+      // load config
+      signers = await loadSigners();
+      templates = await loadTemplates();
+
+      // apply settings fields
+      $("setKasi").value = signers.kasiName || "";
+      $("setBend").value = signers.bendName || "";
+
+      // init STSU
+      stsu = { id:null, jenis:"RETRIBUSI", tglTransaksi:"", tglStsu:"", noStsu:"", sections:[] };
+      buildSectionsFromTemplates();
+
+      // default dashboard month to current month
+      const now = new Date();
+      const mm = String(now.getMonth()+1).padStart(2,"0");
+      $("dashMonth").value = `${now.getFullYear()}-${mm}`;
+
+      // go to Buat STSU
+      showPage("pageBuat");
+      renderAll();
+      loadDashboard().catch(()=>{});
     });
+
+    // initial render safe
+    renderAll();
   </script>
 </body>
 </html>
