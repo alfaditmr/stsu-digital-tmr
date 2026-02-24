@@ -1,1308 +1,236 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem STSU Digital</title>
-
-  <!-- ====== STYLE (Light clean, mobile+print friendly) ====== -->
-  <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e5e7eb;
-      --primary:#2563eb;
-      --primary2:#1d4ed8;
-      --danger:#dc2626;
-      --ok:#16a34a;
-      --shadow:0 8px 24px rgba(15,23,42,.08);
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background:var(--bg);
-    }
-    a{color:inherit}
-    .container{max-width:1100px;margin:0 auto;padding:16px}
-    .topbar{
-      position:sticky;top:0;z-index:50;
-      background:rgba(255,255,255,.92);
-      backdrop-filter:saturate(180%) blur(10px);
-      border-bottom:1px solid var(--line);
-    }
-    .topbar-inner{
-      display:flex;align-items:center;gap:12px;
-      padding:12px 16px;
-      max-width:1100px;margin:0 auto;
-    }
-    .brand{
-      display:flex;align-items:center;gap:10px;min-width:220px;
-    }
-    .logo{
-      width:40px;height:40px;border-radius:14px;
-      display:grid;place-items:center;
-      background:var(--primary);
-      color:#fff;font-weight:800;letter-spacing:.5px;
-      box-shadow:var(--shadow);
-      flex:0 0 auto;
-    }
-    .brand h1{font-size:15px;margin:0;line-height:1.1}
-    .brand p{font-size:12px;margin:2px 0 0;color:var(--muted)}
-    .spacer{flex:1}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      border:1px solid var(--line);
-      background:#fff;border-radius:999px;
-      padding:8px 12px;font-size:12px;color:var(--muted);
-    }
-    .btn{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:600;
-      cursor:pointer;
-      transition:.15s transform,.15s background,.15s border;
-      display:inline-flex;align-items:center;gap:10px;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-    .btn.primary:hover{background:var(--primary2)}
-    .btn.danger{background:#fff;border-color:#fecaca;color:var(--danger)}
-    .btn.ghost{background:transparent}
-    .iconbtn{
-      width:44px;height:44px;border-radius:14px;
-      display:grid;place-items:center;
-      border:1px solid var(--line);background:#fff;
-      cursor:pointer;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:16px;
-      align-items:start;
-    }
-    @media (max-width: 900px){
-      .grid{grid-template-columns:1fr}
-      .brand{min-width:unset}
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .card-h{
-      padding:16px 16px 10px;
-      border-bottom:1px solid var(--line);
-      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
-    }
-    .card-h h2{margin:0;font-size:18px}
-    .card-h p{margin:6px 0 0;color:var(--muted);font-size:13px}
-    .card-b{padding:16px}
-    .badge{
-      font-size:12px;font-weight:800;
-      padding:8px 10px;border-radius:999px;
-      border:1px solid var(--line);
-      color:var(--muted);
-      background:#fff;
-      white-space:nowrap;
-    }
-    .badge.ok{color:var(--ok);border-color:#bbf7d0;background:#f0fdf4}
-    .badge.warn{color:#b45309;border-color:#fde68a;background:#fffbeb}
-
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
-    @media (max-width: 520px){ .row{grid-template-columns:1fr} }
-    label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
-    input,select{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      outline:none;
-      background:#fff;
-      font-size:14px;
-    }
-    input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-    .help{font-size:12px;color:var(--muted);margin-top:6px}
-
-    .section{
-      border:1px solid var(--line);
-      border-radius:16px;
-      overflow:hidden;
-      margin:14px 0;
-    }
-    .section-head{
-      padding:12px 12px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      background:#fbfcff;
-      border-bottom:1px solid var(--line);
-    }
-    .section-title{
-      display:flex;flex-direction:column;gap:2px;
-    }
-    .section-title strong{font-size:14px}
-    .section-title span{font-size:12px;color:var(--muted)}
-    .toggle{
-      display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;font-weight:700;
-    }
-    .switch{
-      width:46px;height:28px;border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;position:relative;cursor:pointer;
-    }
-    .switch::after{
-      content:"";
-      width:22px;height:22px;border-radius:999px;
-      position:absolute;top:2px;left:2px;
-      background:#cbd5e1;transition:.15s;
-    }
-    .switch.on{background:#dcfce7;border-color:#86efac}
-    .switch.on::after{left:22px;background:#16a34a}
-    .section-body{padding:12px}
-    .table{
-      width:100%;
-      border-collapse:collapse;
-    }
-    .table th{
-      text-align:left;
-      font-size:12px;color:var(--muted);
-      padding:8px 6px;border-bottom:1px solid var(--line);
-    }
-    .table td{padding:8px 6px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-    .table td:last-child{text-align:right;white-space:nowrap}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .mini{padding:9px 10px;border-radius:12px;font-size:13px}
-    .mini.danger{border-color:#fecaca;color:var(--danger)}
-    .mini.soft{background:#f8fafc}
-
-    /* ====== SUBTOTAL ROW (label nempel ke angka, garis panjang) ====== */
-    .subtotal{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      align-items:center;
-      gap:10px;
-      margin-top:8px;
-      padding:8px 6px 2px;
-      font-weight:800;
-    }
-    .subtotal .left{
-      display:flex;align-items:center;gap:10px;
-      min-width:0;
-    }
-    .subtotal .label{white-space:nowrap}
-    .subtotal .dots{
-      height:1px;flex:1 1 auto;
-      background:repeating-linear-gradient(
-        to right,
-        rgba(15,23,42,.35) 0,
-        rgba(15,23,42,.35) 6px,
-        transparent 6px,
-        transparent 10px
-      );
-      transform:translateY(1px);
-      min-width:40px;
-    }
-    .subtotal .amt{white-space:nowrap;text-align:right}
-    .subtotal strong{font-weight:900}
-
-    /* ====== RIGHT PANEL: Preview A4 ====== */
-    .preview-wrap{position:sticky;top:90px}
-    @media (max-width: 900px){ .preview-wrap{position:static} }
-
-    .paper{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:16px;
-      box-shadow:var(--shadow);
-      padding:18mm 14mm;
-    }
-    .paper h3{
-      margin:0 0 2mm;
-      text-align:center;
-      font-size:14pt;
-      letter-spacing:.2px;
-    }
-    .paper .no{
-      text-align:center;
-      font-size:10.5pt;
-      margin-bottom:6mm;
-    }
-    .p-section{
-      margin:0 0 4mm;
-    }
-    .p-section-title{
-      font-weight:800;
-      font-size:10.5pt;
-      margin:0 0 2mm;
-    }
-    .p-row{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:8mm;
-      padding:1.2mm 0;
-      border-bottom:1px solid #e5e7eb;
-      font-size:10pt;
-      line-height:1.1;
-    }
-    .p-row:last-child{border-bottom:none}
-    .p-row .name{padding-left:2mm}
-    .p-row .amt{text-align:right;white-space:nowrap}
-    .p-subtotal{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:8mm;
-      padding:1.8mm 0 0;
-      font-size:10pt;
-      font-weight:900;
-    }
-    .p-subtotal .left{
-      display:flex;align-items:center;gap:2mm;
-      min-width:0;
-    }
-    .p-subtotal .label{white-space:nowrap}
-    .p-subtotal .dots{
-      flex:1 1 auto;height:1px;min-width:30mm;
-      background:repeating-linear-gradient(to right, rgba(0,0,0,.45) 0, rgba(0,0,0,.45) 6px, transparent 6px, transparent 10px);
-      transform:translateY(1px);
-    }
-    .p-subtotal .amt{text-align:right;white-space:nowrap}
-
-    .p-total{
-      margin-top:4mm;
-      border-top:2px solid #111827;
-      padding-top:3mm;
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:8mm;
-      font-weight:900;
-      font-size:10.5pt;
-    }
-    .p-terbilang{
-      margin-top:2mm;
-      font-size:9.5pt;
-    }
-    .p-penutup{
-      margin-top:3mm;
-      font-size:9.5pt;
-      line-height:1.35;
-    }
-    .p-ttd{
-      margin-top:10mm;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20mm;
-      font-size:9.5pt;
-    }
-    .p-ttd .tgl{
-      text-align:right;
-      margin-bottom:10mm;
-      font-style:normal; /* biar tidak “miring” */
-    }
-    .p-ttd .role{margin-bottom:12mm}
-    .p-ttd .name{
-      font-weight:900;
-      text-decoration:underline;
-      text-underline-offset:2px;
-    }
-
-    /* ====== DRAWER MENU ====== */
-    .overlay{
-      position:fixed;inset:0;background:rgba(15,23,42,.45);
-      display:none;z-index:80;
-    }
-    .overlay.show{display:block}
-    .drawer{
-      position:fixed;top:0;right:0;height:100%;
-      width:min(420px, 92vw);
-      background:#fff;border-left:1px solid var(--line);
-      box-shadow: -20px 0 50px rgba(15,23,42,.18);
-      transform:translateX(105%);
-      transition:.2s;
-      z-index:90;
-      display:flex;flex-direction:column;
-    }
-    .drawer.show{transform:translateX(0)}
-    .drawer-h{
-      padding:14px 14px;border-bottom:1px solid var(--line);
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      font-weight:800;
-    }
-    .drawer-b{padding:12px;display:flex;flex-direction:column;gap:10px}
-    .navcard{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px;
-      cursor:pointer;
-      display:flex;justify-content:space-between;align-items:center;
-      background:#fff;
-    }
-    .navcard:hover{background:#f8fafc}
-    .navcard .t{font-weight:800}
-    .navcard .s{font-size:12px;color:var(--muted);margin-top:2px}
-
-    /* ====== PRINT ====== */
-    @media print{
-      body{background:#fff}
-      .topbar, .container > .grid > .card:first-child, .drawer, .overlay{display:none !important}
-      .container{padding:0}
-      .grid{display:block}
-      .preview-wrap{position:static}
-      .paper{
-        border:none;box-shadow:none;border-radius:0;
-        padding:18mm 14mm;
-      }
-    }
-    @page{
-      size: A4;
-      margin: 10mm;
-    }
-
-    .hidden{display:none !important}
-    .muted{color:var(--muted)}
-    .hr{height:1px;background:var(--line);margin:12px 0}
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>STSU Digital</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
-
 <body>
-  <!-- ====== TOPBAR ====== -->
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="logo">SU</div>
-        <div>
-          <h1>Sistem STSU Digital</h1>
-          <p>TMR • Modern tapi tetap resmi</p>
-        </div>
-      </div>
 
-      <div class="spacer"></div>
-
-      <span id="authPill" class="pill">Auth: <b>OFF</b></span>
-      <button class="iconbtn" id="btnMenu" title="Menu">☰</button>
+<header class="topbar no-print">
+  <div class="brand">
+    <div class="logo">SU</div>
+    <div>
+      <div class="brand-title">STSU Digital</div>
+      <div class="brand-sub">Login • Draft • Dashboard • Cetak A4</div>
     </div>
   </div>
 
-  <div class="container">
-    <div class="grid">
-      <!-- ====== LEFT: APP ====== -->
-      <div class="card">
-        <div class="card-h">
-          <div>
-            <h2 id="pageTitle">Login</h2>
-            <p id="pageSub">Masuk pakai akun Firebase (Email/Password).</p>
-          </div>
-          <span id="badgeStatus" class="badge warn">BELUM LOGIN</span>
-        </div>
-        <div class="card-b">
+  <div class="top-actions">
+    <span id="authBadge" class="badge">Auth: OFF</span>
+    <button id="btnMenu" class="iconbtn" aria-label="Menu">☰</button>
+  </div>
+</header>
 
-          <!-- ====== LOGIN PAGE ====== -->
-          <div id="pageLogin">
-            <div class="row">
-              <div>
-                <label>Email</label>
-                <input id="loginEmail" type="email" placeholder="nama@domain.com" />
-              </div>
-              <div>
-                <label>Password</label>
-                <input id="loginPass" type="password" placeholder="••••••••" />
-              </div>
-            </div>
-            <div class="actions">
-              <button class="btn primary" id="btnLogin">Login</button>
-              <button class="btn" id="btnReset">Lupa Password</button>
-              <button class="btn danger" id="btnLogout">Logout</button>
-            </div>
-
-            <div class="hr"></div>
-
-            <div class="card" style="box-shadow:none">
-              <div class="card-h" style="border-bottom:none">
-                <div>
-                  <h2 style="font-size:16px;margin:0">Status</h2>
-                  <p style="margin:6px 0 0" class="muted">Info user & akses.</p>
-                </div>
-                <span id="roleBadge" class="badge">role: -</span>
-              </div>
-              <div class="card-b" style="padding-top:0">
-                <div class="row">
-                  <div>
-                    <label>UID</label>
-                    <input id="statUid" disabled />
-                  </div>
-                  <div>
-                    <label>Email</label>
-                    <input id="statEmail" disabled />
-                  </div>
-                </div>
-                <p class="help">
-                  Setelah login berhasil, menu <b>Settings</b> akan muncul otomatis jika role = <b>admin</b>.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- ====== BUAT STSU PAGE ====== -->
-          <div id="pageBuat" class="hidden">
-            <div class="row">
-              <div>
-                <label>Jenis STSU</label>
-                <select id="jenis">
-                  <option value="R">Pendapatan Retribusi</option>
-                  <option value="L">Pendapatan Lainnya</option>
-                </select>
-              </div>
-              <div>
-                <label>Status</label>
-                <input id="draftStatus" disabled value="DRAFT" />
-              </div>
-            </div>
-
-            <div class="row">
-              <div>
-                <label>Tanggal Transaksi (untuk nomor STSU)</label>
-                <input id="tglTransaksi" type="date" />
-                <div class="help">
-                  Nomor STSU dibuat dari tanggal transaksi: <b>No. [URUT]/[TGL]/[BLN]/SU/[TAHUN]</b> (Retribusi) dan
-                  <b>No. [URUT]/[TGL]/[BLN]/SU/L/[TAHUN]</b> (Lainnya).
-                </div>
-              </div>
-              <div>
-                <label>Tanggal STSU/TTD (boleh kosong dulu)</label>
-                <input id="tglSTSU" type="date" />
-                <div class="help">Bisa diisi belakangan saat final.</div>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="btn" id="btnMakeNo">Buat / Refresh Nomor</button>
-              <button class="btn primary" id="btnSaveDraft">Simpan Draft</button>
-              <button class="btn" id="btnPrint">Print / Save PDF</button>
-            </div>
-
-            <div class="hr"></div>
-
-            <div>
-              <label>Nomor STSU</label>
-              <input id="nomor" disabled />
-              <div class="help">Nomor dibuat saat klik “Buat/Refresh Nomor” atau saat simpan pertama kali.</div>
-            </div>
-
-            <div class="hr"></div>
-
-            <div class="actions">
-              <button class="btn mini soft" id="btnAddSection">+ Tambah Section Baru</button>
-            </div>
-
-            <div id="sections"></div>
-          </div>
-
-          <!-- ====== DASHBOARD ====== -->
-          <div id="pageDash" class="hidden">
-            <p class="muted" style="margin-top:0">
-              Dashboard ringkasan pendapatan (filter tanggal/bulan) — kita aktifkan setelah data tersimpan rapi.
-            </p>
-
-            <div class="row">
-              <div>
-                <label>Filter Bulan</label>
-                <input id="dashMonth" type="month" />
-              </div>
-              <div>
-                <label>Jenis</label>
-                <select id="dashJenis">
-                  <option value="ALL">Semua</option>
-                  <option value="R">Retribusi</option>
-                  <option value="L">Lainnya</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="btn primary" id="btnDashLoad">Muat Ringkasan</button>
-            </div>
-
-            <div class="hr"></div>
-            <div id="dashOut" class="muted">Belum ada data.</div>
-          </div>
-
-          <!-- ====== SETTINGS (ADMIN) ====== -->
-          <div id="pageSettings" class="hidden">
-            <p class="muted" style="margin-top:0">
-              Admin bisa mengatur nama penandatangan & template kategori (tambah/hapus permanen).
-            </p>
-
-            <div class="row">
-              <div>
-                <label>Nama Kepala Seksi</label>
-                <input id="setKasi" placeholder="Nama Kepala Seksi" />
-              </div>
-              <div>
-                <label>Nama Bendahara</label>
-                <input id="setBend" placeholder="Nama Bendahara" />
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="btn primary" id="btnSaveSig">Simpan Pengaturan</button>
-            </div>
-
-            <div class="hr"></div>
-
-            <h3 style="margin:0 0 10px;font-size:16px">Buat User (cara aman)</h3>
-            <ol class="muted" style="margin:0 0 10px;padding-left:18px;font-size:13px;line-height:1.5">
-              <li>Firebase Console → Build → Authentication → Users → Add user</li>
-              <li>User login sekali untuk dapat UID</li>
-              <li>Masukkan UID user di bawah → set role “user”</li>
-            </ol>
-
-            <div class="row">
-              <div>
-                <label>UID User</label>
-                <input id="newUid" placeholder="paste UID user" />
-              </div>
-              <div>
-                <label>Role</label>
-                <select id="newRole">
-                  <option value="user">user</option>
-                  <option value="admin">admin</option>
-                </select>
-              </div>
-            </div>
-            <div class="actions">
-              <button class="btn primary" id="btnSetRole">Set Role ke RTDB</button>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ====== RIGHT: PREVIEW ====== -->
-      <div class="preview-wrap">
-        <div class="card">
-          <div class="card-h">
-            <div>
-              <h2>Preview A4</h2>
-              <p>Rapi & rapat. Item nominal 0 tidak tampil, tidak tersimpan, tidak tercetak.</p>
-            </div>
-            <span class="badge">A4</span>
-          </div>
-          <div class="card-b">
-            <div id="paper" class="paper">
-              <h3>SURAT TANDA SETOR UANG</h3>
-              <div class="no">No: <span id="pNo">-</span></div>
-              <div id="pBody" class="muted">Silakan login, lalu isi STSU untuk melihat preview.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- grid -->
-  </div><!-- container -->
-
-  <!-- ====== DRAWER ====== -->
-  <div class="overlay" id="overlay"></div>
-  <div class="drawer" id="drawer">
-    <div class="drawer-h">
-      <div>Menu</div>
-      <button class="btn" id="btnClose">Tutup</button>
-    </div>
-    <div class="drawer-b">
-      <div class="navcard" data-nav="dash">
-        <div>
-          <div class="t">Dashboard</div>
-          <div class="s">Ringkasan pendapatan</div>
-        </div>
-        <div>›</div>
-      </div>
-      <div class="navcard" data-nav="buat">
-        <div>
-          <div class="t">Buat STSU</div>
-          <div class="s">Input + preview PDF</div>
-        </div>
-        <div>›</div>
-      </div>
-      <div class="navcard" id="navSettings" data-nav="settings" style="display:none">
-        <div>
-          <div class="t">Settings (Admin)</div>
-          <div class="s">Kategori & template</div>
-        </div>
-        <div>›</div>
-      </div>
-      <div class="navcard" data-nav="login">
-        <div>
-          <div class="t">Login</div>
-          <div class="s">Akun Firebase</div>
-        </div>
-        <div>›</div>
-      </div>
-    </div>
+<!-- Drawer -->
+<div id="backdrop" class="backdrop hidden no-print"></div>
+<aside id="drawer" class="drawer hidden no-print">
+  <div class="drawer-head">
+    <div class="drawer-title">Menu</div>
+    <button id="btnCloseMenu" class="btn">Tutup</button>
   </div>
 
-  <!-- ====== FIREBASE (CDN module — cocok untuk GitHub Pages, tanpa Node.js) ====== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import {
-      getAuth, onAuthStateChanged,
-      signInWithEmailAndPassword, signOut,
-      sendPasswordResetEmail
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  <div class="drawer-body">
+    <button class="nav" data-go="dashboard">
+      <div class="nav-title">Dashboard</div>
+      <div class="nav-sub">10 STSU terakhir + search tanggal</div>
+    </button>
+    <button class="nav" data-go="buat">
+      <div class="nav-title">Buat STSU</div>
+      <div class="nav-sub">Input + preview + simpan draft + final</div>
+    </button>
+  </div>
 
-    import {
-      getDatabase, ref, get, set, update, push,
-      runTransaction, serverTimestamp, query, orderByChild, startAt, endAt
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+  <div class="drawer-foot">
+    <div class="pill">UID: <b id="uidText">-</b></div>
+    <div class="pill">Role: <b id="roleText">-</b></div>
+    <button id="btnLogout" class="btn danger">Logout</button>
+  </div>
+</aside>
 
-    // ====== CONFIG (punyamu) ======
-    const firebaseConfig = {
-      apiKey: "AIzaSyDqIE0cumE-7RgK3XE5QIYyQLpzgl1nB8A",
-      authDomain: "stsu-ee385.firebaseapp.com",
-      databaseURL: "https://stsu-ee385-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "stsu-ee385",
-      storageBucket: "stsu-ee385.firebasestorage.app",
-      messagingSenderId: "415025124329",
-      appId: "1:415025124329:web:bbfd49874ddf236d16b178"
-    };
+<main class="container">
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+  <!-- LOGIN -->
+  <section id="page-login" class="page">
+    <div class="card">
+      <h2>Login</h2>
+      <p class="muted">Masuk pakai Firebase Authentication (Email/Password).</p>
 
-    // ====== UI Helpers ======
-    const $ = (id)=>document.getElementById(id);
-    const show = (el, v)=> el.classList.toggle("hidden", !v);
-
-    function openDrawer(v){
-      $("overlay").classList.toggle("show", v);
-      $("drawer").classList.toggle("show", v);
-    }
-
-    $("btnMenu").onclick = ()=>openDrawer(true);
-    $("btnClose").onclick = ()=>openDrawer(false);
-    $("overlay").onclick = ()=>openDrawer(false);
-
-    // ====== App State ======
-    let user = null;
-    let role = "user";
-
-    // sections runtime (bisa tambah)
-    let state = {
-      jenis: "R",
-      tglTransaksi: "",
-      tglSTSU: "",
-      nomor: "",
-      sections: []
-    };
-
-    // ====== Default Section Templates ======
-    const defaultSections = [
-      { id:"fasil", name:"Pemakaian Fasilitas", desc:"fleksibel (sesuai pemakaian hari itu)", active:true, items:[
-        { label:"Panggung", nominal:0 },
-        { label:"Lahan terbuka", nominal:0 },
-      ]},
-      { id:"custom1", name:"Section Baru (ubah nama)", desc:"bisa untuk retribusi juru foto / dll", active:false, items:[
-        { label:"Juru foto", nominal:0 },
-      ]},
-      { id:"etiket", name:"E-ticketing", desc:"template sama seperti e-ticketing", active:true, items:[
-        { label:"Dewasa", nominal:0 },
-        { label:"Anak", nominal:0 },
-        { label:"Rombongan Dewasa", nominal:0 },
-        { label:"Rombongan Anak", nominal:0 },
-        { label:"Taman Satwa Anak", nominal:0 },
-        // Pusat Primata (gabung jadi 4 item seperti requestmu)
-        { label:"Pusat Primata Hari Biasa Dewasa", nominal:0 },
-        { label:"Pusat Primata Hari Biasa Anak", nominal:0 },
-        { label:"Pusat Primata Hari Besar Dewasa", nominal:0 },
-        { label:"Pusat Primata Hari Besar Anak", nominal:0 },
-        { label:"Kendaraan Gol 1", nominal:0 },
-        { label:"Kendaraan Gol 2", nominal:0 },
-        { label:"Kendaraan Gol 3", nominal:0 },
-        { label:"Motor", nominal:0 },
-        { label:"Sepeda", nominal:0 },
-      ]},
-      { id:"tiket", name:"Tiket Online", desc:"template sama seperti tiket online", active:true, items:[
-        { label:"Dewasa", nominal:0 },
-        { label:"Anak", nominal:0 },
-        { label:"Taman Satwa Anak", nominal:0 },
-        { label:"Pusat Primata Hari Biasa Dewasa", nominal:0 },
-        { label:"Pusat Primata Hari Biasa Anak", nominal:0 },
-        { label:"Pusat Primata Hari Besar Dewasa", nominal:0 },
-        { label:"Pusat Primata Hari Besar Anak", nominal:0 },
-        { label:"Kendaraan Gol 2", nominal:0 },
-        { label:"Kendaraan Gol 3", nominal:0 },
-        { label:"Motor", nominal:0 },
-        { label:"Sepeda", nominal:0 },
-      ]},
-      { id:"vending", name:"Vending Machine", desc:"template sama seperti vending", active:false, items:[
-        { label:"Dewasa", nominal:0 },
-        { label:"Anak", nominal:0 },
-      ]},
-      { id:"newgate", name:"New Gate", desc:"template sama seperti new gate", active:true, items:[
-        { label:"Dewasa", nominal:0 },
-        { label:"Anak", nominal:0 },
-        { label:"Kendaraan Gol 1", nominal:0 },
-        { label:"Kendaraan Gol 3", nominal:0 },
-        { label:"Motor", nominal:0 },
-        { label:"Sepeda", nominal:0 },
-      ]},
-    ];
-
-    function cloneDefaults(){
-      return defaultSections.map(s=>({
-        id:s.id,
-        name:s.name,
-        desc:s.desc,
-        active: !!s.active,
-        items: s.items.map(i=>({label:i.label, nominal:0}))
-      }));
-    }
-
-    // ====== Formatting ======
-    const pad2 = (n)=> String(n).padStart(2,"0");
-
-    function fmtRp(n){
-      const x = Math.round(Number(n||0));
-      return "Rp " + x.toLocaleString("id-ID");
-    }
-    function parseNominal(v){
-      if(v===null || v===undefined) return 0;
-      const s = String(v).replace(/[^\d]/g,"");
-      const n = Number(s||0);
-      return isFinite(n) ? n : 0;
-    }
-    function dateParts(iso){
-      // iso: YYYY-MM-DD
-      const [y,m,d]= (iso||"").split("-").map(Number);
-      return {y,m,d};
-    }
-    function hariIndo(iso){
-      if(!iso) return "";
-      const dt = new Date(iso+"T00:00:00");
-      const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-      return days[dt.getDay()];
-    }
-    function tanggalIndo(iso){
-      if(!iso) return "";
-      const {y,m,d} = dateParts(iso);
-      const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-      return `${pad2(d)} ${bulan[m-1]} ${y}`;
-    }
-
-    // ====== Terbilang (ringkas, cukup untuk rupiah) ======
-    function terbilang(n){
-      n = Math.floor(Number(n||0));
-      if(n===0) return "nol rupiah";
-      const satuan = ["","satu","dua","tiga","empat","lima","enam","tujuh","delapan","sembilan","sepuluh","sebelas"];
-      function t(x){
-        x = Math.floor(x);
-        if(x<12) return satuan[x];
-        if(x<20) return t(x-10)+" belas";
-        if(x<100) return t(x/10)+" puluh"+(x%10?(" "+t(x%10)):"");
-        if(x<200) return "seratus"+(x-100?(" "+t(x-100)):"");
-        if(x<1000) return t(x/100)+" ratus"+(x%100?(" "+t(x%100)):"");
-        if(x<2000) return "seribu"+(x-1000?(" "+t(x-1000)):"");
-        if(x<1_000_000) return t(x/1000)+" ribu"+(x%1000?(" "+t(x%1000)):"");
-        if(x<1_000_000_000) return t(x/1_000_000)+" juta"+(x%1_000_000?(" "+t(x%1_000_000)):"");
-        if(x<1_000_000_000_000) return t(x/1_000_000_000)+" miliar"+(x%1_000_000_000?(" "+t(x%1_000_000_000)):"");
-        return t(x/1_000_000_000_000)+" triliun"+(x%1_000_000_000_000?(" "+t(x%1_000_000_000_000)):"");
-      }
-      return t(n).replace(/\s+/g," ").trim()+" rupiah";
-    }
-
-    // ====== Number Generator (counter per jenis per tahun, dipicu tanggal transaksi) ======
-    async function genNomorByTanggal(){
-      if(!state.tglTransaksi){
-        alert("Isi Tanggal Transaksi dulu.");
-        return;
-      }
-      const {y,m,d} = dateParts(state.tglTransaksi);
-      const year = String(y);
-      const jenis = state.jenis; // R / L
-
-      // counter path
-      const counterRef = ref(db, `counters/${year}/${jenis}/last`);
-      const result = await runTransaction(counterRef, (cur)=>{
-        if(cur===null) return 1;
-        return Number(cur)+1;
-      });
-
-      const urut = result.snapshot.val();
-      const no = (jenis==="R")
-        ? `${urut}/${pad2(d)}/${pad2(m)}/SU/${year}`
-        : `${urut}/${pad2(d)}/${pad2(m)}/SU/L/${year}`;
-
-      state.nomor = no;
-      $("nomor").value = no;
-      $("pNo").textContent = no;
-      renderPreview();
-    }
-
-    // ====== Ignore zero: clean data for save & print ======
-    function cleanedSectionsForOutput(){
-      // tampil section bila active dan punya minimal 1 item nominal>0
-      const out = [];
-      for(const s of state.sections){
-        if(!s.active) continue;
-
-        const items = (s.items||[])
-          .map(it=>({label:(it.label||"").trim(), nominal: Number(it.nominal||0)}))
-          .filter(it=>it.label && it.nominal>0); // <<< IGNORE 0
-
-        if(items.length===0) continue;
-
-        const subtotal = items.reduce((a,b)=>a+b.nominal,0);
-        out.push({ id:s.id, name:s.name, desc:s.desc, items, subtotal });
-      }
-      return out;
-    }
-
-    function grandTotal(outSections){
-      return outSections.reduce((sum,s)=>sum + (s.subtotal||0), 0);
-    }
-
-    // ====== Render Sections Editor (left) ======
-    function renderSectionsEditor(){
-      const wrap = $("sections");
-      wrap.innerHTML = "";
-
-      state.sections.forEach((s, si)=>{
-        const sec = document.createElement("div");
-        sec.className = "section";
-
-        const head = document.createElement("div");
-        head.className = "section-head";
-
-        const title = document.createElement("div");
-        title.className = "section-title";
-        title.innerHTML = `<strong>${escapeHtml(s.name)}</strong><span>${escapeHtml(s.desc||"")}</span>`;
-
-        const right = document.createElement("div");
-        right.className = "toggle";
-        right.innerHTML = `Aktif <div class="switch ${s.active?"on":""}" data-si="${si}"></div>`;
-
-        head.appendChild(title);
-        head.appendChild(right);
-        sec.appendChild(head);
-
-        const body = document.createElement("div");
-        body.className = "section-body";
-        body.innerHTML = `
-          <table class="table">
-            <thead><tr><th>Kategori</th><th style="text-align:right">Nominal</th><th style="width:90px;text-align:right"> </th></tr></thead>
-            <tbody id="tbody-${si}"></tbody>
-          </table>
-          <div class="actions">
-            <button class="btn mini soft" data-add="${si}">+ Tambah baris</button>
-            <button class="btn mini" data-rename="${si}">Ubah nama section</button>
-          </div>
-        `;
-
-        sec.appendChild(body);
-        wrap.appendChild(sec);
-
-        const tb = sec.querySelector(`#tbody-${si}`);
-        (s.items||[]).forEach((it, ii)=>{
-          const tr = document.createElement("tr");
-
-          const td1 = document.createElement("td");
-          const inp1 = document.createElement("input");
-          inp1.value = it.label || "";
-          inp1.oninput = (e)=>{ state.sections[si].items[ii].label = e.target.value; renderPreview(); };
-          td1.appendChild(inp1);
-
-          const td2 = document.createElement("td");
-          td2.style.textAlign = "right";
-          const inp2 = document.createElement("input");
-          inp2.inputMode = "numeric";
-          inp2.placeholder = "0";
-          inp2.value = it.nominal ? String(it.nominal) : "";
-          inp2.oninput = (e)=>{
-            const n = parseNominal(e.target.value);
-            state.sections[si].items[ii].nominal = n;
-            // tampilkan kembali angka yang rapi tanpa terlalu agresif
-            // (biar user tidak terganggu saat ngetik)
-            renderPreview();
-          };
-          td2.appendChild(inp2);
-
-          const td3 = document.createElement("td");
-          td3.style.textAlign="right";
-          const del = document.createElement("button");
-          del.className = "btn mini danger";
-          del.textContent = "Hapus";
-          del.onclick = ()=>{
-            state.sections[si].items.splice(ii,1);
-            renderSectionsEditor();
-            renderPreview();
-          };
-          td3.appendChild(del);
-
-          tr.appendChild(td1);
-          tr.appendChild(td2);
-          tr.appendChild(td3);
-          tb.appendChild(tr);
-        });
-
-        // Bind toggle
-        sec.querySelector(".switch").onclick = ()=>{
-          state.sections[si].active = !state.sections[si].active;
-          renderSectionsEditor();
-          renderPreview();
-        };
-
-        // add row
-        sec.querySelector(`[data-add="${si}"]`).onclick = ()=>{
-          state.sections[si].items.push({label:"", nominal:0});
-          renderSectionsEditor();
-          renderPreview();
-        };
-
-        // rename
-        sec.querySelector(`[data-rename="${si}"]`).onclick = ()=>{
-          const nm = prompt("Nama section:", state.sections[si].name || "");
-          if(nm!==null){
-            state.sections[si].name = nm.trim() || state.sections[si].name;
-            renderSectionsEditor();
-            renderPreview();
-          }
-        };
-      });
-
-      // global add section
-      $("btnAddSection").onclick = ()=>{
-        const id = `custom_${Date.now()}`;
-        state.sections.splice(1,0,{
-          id, name:"Section Baru (ubah nama)", desc:"custom (mis: retribusi juru foto / dll)", active:true,
-          items:[{label:"", nominal:0}]
-        });
-        renderSectionsEditor();
-        renderPreview();
-      };
-    }
-
-    // ====== Render Preview A4 (right) ======
-    let cachedSig = { kasi:"NAMA KEPALA SEKSI", bend:"NAMA BENDAHARA" };
-
-    async function loadSignatureSettings(){
-      const snap = await get(ref(db, "settings/signature"));
-      if(snap.exists()){
-        cachedSig = {...cachedSig, ...snap.val()};
-      }
-    }
-
-    function renderPreview(){
-      $("pNo").textContent = state.nomor || "-";
-
-      const outSections = cleanedSectionsForOutput(); // <<< 0 tidak ikut
-      const total = grandTotal(outSections);
-
-      if(!user){
-        $("pBody").innerHTML = `<div class="muted">Silakan login dulu.</div>`;
-        return;
-      }
-      if(!state.tglTransaksi){
-        $("pBody").innerHTML = `<div class="muted">Isi tanggal transaksi untuk mulai.</div>`;
-        return;
-      }
-
-      let html = "";
-      for(const s of outSections){
-        html += `<div class="p-section">`;
-        html += `<div class="p-section-title">${escapeHtml(s.name)}</div>`;
-        for(const it of s.items){
-          html += `
-            <div class="p-row">
-              <div class="name">${escapeHtml(it.label)}</div>
-              <div class="amt">${fmtRp(it.nominal)}</div>
-            </div>
-          `;
-        }
-        // subtotal satu baris, label “nempel” dan garis panjang
-        html += `
-          <div class="p-subtotal">
-            <div class="left">
-              <span class="label">Subtotal ${escapeHtml(s.name)}&nbsp;</span>
-              <span class="dots"></span>
-            </div>
-            <div class="amt">${fmtRp(s.subtotal)}</div>
-          </div>
-        `;
-        html += `</div>`;
-      }
-
-      html += `
-        <div class="p-total">
-          <div>JUMLAH TOTAL</div>
-          <div style="text-align:right">${fmtRp(total)}</div>
+      <div class="grid2">
+        <div>
+          <label>Email</label>
+          <input id="loginEmail" type="email" placeholder="email@..." autocomplete="username">
         </div>
-        <div class="p-terbilang"><b>Terbilang</b> : ${escapeHtml(terbilang(total))}</div>
-      `;
-
-      // Penutup hanya untuk Retribusi
-      if(state.jenis==="R"){
-        const penutup = `Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR pada hari ${hariIndo(state.tglTransaksi)} tanggal ${tanggalIndo(state.tglTransaksi)} dengan STSU No. ${state.nomor || "-"} dengan uang sebesar ${fmtRp(total)}.`;
-        html += `<div class="p-penutup">${escapeHtml(penutup)}</div>`;
-      }
-
-      const ttdDate = state.tglSTSU ? `Jakarta, ${tanggalIndo(state.tglSTSU)}` : `Jakarta, ..............`;
-      html += `
-        <div class="p-ttd">
-          <div>
-            <div class="role">Kepala Seksi Pelayanan & Informasi</div>
-            <div class="name">${escapeHtml(cachedSig.kasi || "NAMA KEPALA SEKSI")}</div>
-          </div>
-          <div>
-            <div class="tgl">${escapeHtml(ttdDate)}</div>
-            <div class="role">Bendahara Penerimaan</div>
-            <div class="name">${escapeHtml(cachedSig.bend || "NAMA BENDAHARA")}</div>
-          </div>
+        <div>
+          <label>Password</label>
+          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
         </div>
-      `;
+      </div>
 
-      $("pBody").innerHTML = html || `<div class="muted">Belum ada item nominal > 0.</div>`;
-    }
+      <div class="row">
+        <button id="btnLogin" class="btn primary">Login</button>
+        <button id="btnReset" class="btn">Lupa Password</button>
+      </div>
 
-    // ====== Save Draft to RTDB (ignore 0) ======
-    async function saveDraft(){
-      if(!user){ alert("Login dulu."); return; }
-      if(!state.tglTransaksi){ alert("Isi tanggal transaksi dulu."); return; }
+      <div id="loginMsg" class="msg"></div>
 
-      // nomor: kalau belum ada, generate dulu
-      if(!state.nomor){
-        await genNomorByTanggal();
-      }
+      <div class="hr"></div>
 
-      const outSections = cleanedSectionsForOutput(); // <<< 0 tidak ikut tersimpan
-      const total = grandTotal(outSections);
+      <div class="pill">Auth: <b id="stAuth">OFF</b></div>
+      <div class="pill">UID: <b id="stUid">-</b></div>
+      <div class="pill">Email: <b id="stEmail">-</b></div>
+      <div class="pill">Role: <b id="stRole">-</b></div>
+    </div>
+  </section>
 
-      if(outSections.length===0){
-        alert("Belum ada item nominal > 0. Isi dulu, baru simpan.");
-        return;
-      }
+  <!-- DASHBOARD -->
+  <section id="page-dashboard" class="page hidden">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Dashboard</h2>
+          <p class="muted">Menampilkan <b>10 STSU terakhir</b> (DRAFT & FINAL). Cari lainnya via tanggal transaksi.</p>
+        </div>
+        <span class="badge" id="dashBadge">READY</span>
+      </div>
 
-      const {y} = dateParts(state.tglTransaksi);
-      const year = String(y);
-      const jenis = state.jenis;
+      <div class="grid2">
+        <div>
+          <label>Search Tanggal Transaksi</label>
+          <input id="qTanggal" type="date">
+          <div class="muted">Pakai ini untuk mencari STSU di luar 10 terakhir.</div>
+        </div>
+        <div>
+          <label>Jenis</label>
+          <select id="qJenis">
+            <option value="ALL">Semua</option>
+            <option value="Retribusi">Retribusi</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+          <div class="muted">Filter jenis di hasil list.</div>
+        </div>
+      </div>
 
-      const payload = {
-        status: "DRAFT",
-        jenis,
-        nomor: state.nomor,
-        tglTransaksi: state.tglTransaksi,
-        tglSTSU: state.tglSTSU || "",
-        sections: outSections,
-        total,
-        terbilang: terbilang(total),
-        createdBy: user.uid,
-        createdAt: serverTimestamp()
-      };
+      <div class="row">
+        <button id="btnLoadLast10" class="btn primary">Muat 10 Terakhir</button>
+        <button id="btnSearchTanggal" class="btn">Search Tanggal</button>
+      </div>
 
-      const id = state.nomor.replace(/[^\w]/g,"_");
-      await set(ref(db, `stsu/${year}/${jenis}/${id}`), payload);
+      <div class="summary">
+        <div class="pill">Jumlah: <b id="sumCount">0</b></div>
+        <div class="pill">Total: <b id="sumTotal">Rp 0</b></div>
+      </div>
+    </div>
 
-      alert("Draft tersimpan ✅ (nilai 0 tidak ikut tersimpan)");
-    }
+    <div class="card">
+      <h3>Grafik Pendapatan (Hasil List Saat Ini)</h3>
+      <canvas id="chartDaily" height="120"></canvas>
+      <p class="muted">Grafik dijumlahkan per tanggal transaksi dari list yang sedang tampil.</p>
+    </div>
 
-    // ====== Dashboard (simple sum) ======
-    async function loadDashboard(){
-      if(!user){ alert("Login dulu."); return; }
+    <div class="card">
+      <div class="table">
+        <div class="thead">
+          <div>No STSU</div>
+          <div>Tgl Transaksi</div>
+          <div>Jenis</div>
+          <div>Status</div>
+          <div class="tr">Total</div>
+          <div class="tr">Aksi</div>
+        </div>
+        <div id="stsuList" class="tbody"></div>
+      </div>
+      <div class="muted" id="dashInfo"></div>
+    </div>
+  </section>
 
-      const ym = $("dashMonth").value; // YYYY-MM
-      if(!ym){ alert("Pilih bulan."); return; }
-      const [yy,mm] = ym.split("-").map(Number);
+  <!-- BUAT -->
+  <section id="page-buat" class="page hidden">
+    <div class="card no-print">
+      <div class="card-head">
+        <div>
+          <h2>Buat STSU</h2>
+          <p class="muted">
+            <b>Refresh Nomor</b> hanya preview (tidak menaikkan counter).
+            <b>Simpan Draft</b> akan booking nomor (counter naik) dan muncul di dashboard.
+          </p>
+        </div>
+        <span class="badge" id="buatBadge">DRAFT</span>
+      </div>
 
-      const start = `${yy}-${pad2(mm)}-01`;
-      const end = `${yy}-${pad2(mm)}-31`;
+      <div class="grid2">
+        <div>
+          <label>Jenis STSU</label>
+          <select id="jenis">
+            <option value="Retribusi">Retribusi</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label>Tanggal Transaksi (penentu nomor)</label>
+          <input id="tglTransaksi" type="date">
+        </div>
+      </div>
 
-      const jenisFilter = $("dashJenis").value; // ALL/R/L
-      const year = String(yy);
+      <div class="grid2">
+        <div>
+          <label>Tanggal STSU/TTD (boleh kosong dulu)</label>
+          <input id="tglStsu" type="date">
+          <div class="muted">Boleh diisi belakangan (draft). Final bisa dilakukan kapan saja.</div>
+        </div>
+        <div>
+          <label>No STSU</label>
+          <input id="noStsu" type="text" disabled placeholder="Klik Refresh / Simpan Draft">
+          <div class="muted">Refresh = preview. Simpan Draft = nomor resmi.</div>
+        </div>
+      </div>
 
-      let sumR = 0, sumL = 0, count = 0;
+      <div class="grid2">
+        <div>
+          <label>Nama Kepala Seksi</label>
+          <input id="namaKasi" placeholder="Nama Kepala Seksi">
+        </div>
+        <div>
+          <label>Nama Bendahara</label>
+          <input id="namaBend" placeholder="Nama Bendahara">
+        </div>
+      </div>
 
-      async function scanJenis(j){
-        const baseRef = ref(db, `stsu/${year}/${j}`);
-        const snap = await get(baseRef);
-        if(!snap.exists()) return;
+      <div class="row">
+        <button id="btnAddSection" class="btn">+ Tambah Section</button>
+      </div>
 
-        const data = snap.val();
-        for(const k of Object.keys(data)){
-          const row = data[k];
-          if(!row || !row.tglTransaksi) continue;
-          if(row.tglTransaksi >= start && row.tglTransaksi <= end){
-            count++;
-            if(j==="R") sumR += Number(row.total||0);
-            if(j==="L") sumL += Number(row.total||0);
-          }
-        }
-      }
+      <div id="sectionsWrap" class="sections"></div>
 
-      if(jenisFilter==="ALL"){
-        await scanJenis("R"); await scanJenis("L");
-      }else{
-        await scanJenis(jenisFilter);
-      }
+      <div class="row">
+        <button id="btnRefreshNo" class="btn">Refresh Nomor (Preview)</button>
+        <button id="btnPreview" class="btn">Refresh Preview</button>
+        <button id="btnSaveDraft" class="btn primary">Simpan Draft (Booking Nomor)</button>
+        <button id="btnFinal" class="btn">Final (Ubah Status)</button>
+        <button id="btnPrint" class="btn">Cetak</button>
+      </div>
 
-      const total = sumR + sumL;
-      $("dashOut").innerHTML = `
-        <div><b>Periode:</b> ${ym}</div>
-        <div><b>Jumlah data:</b> ${count}</div>
-        <div style="margin-top:8px"><b>Total Retribusi:</b> ${fmtRp(sumR)}</div>
-        <div><b>Total Lainnya:</b> ${fmtRp(sumL)}</div>
-        <div style="margin-top:8px;font-weight:900"><b>Grand Total:</b> ${fmtRp(total)}</div>
-      `;
-    }
+      <div id="buatMsg" class="msg"></div>
 
-    // ====== Settings (signature) ======
-    async function saveSignature(){
-      if(!user || role!=="admin"){ alert("Admin saja."); return; }
-      const kasi = $("setKasi").value.trim();
-      const bend = $("setBend").value.trim();
-      await set(ref(db, "settings/signature"), { kasi, bend, updatedAt: Date.now(), updatedBy: user.uid });
-      cachedSig = { kasi, bend };
-      alert("Tersimpan ✅");
-      renderPreview();
-    }
+      <div class="hr"></div>
+      <div class="muted">
+        <b>Catatan:</b> Item nominal 0 tidak disimpan & tidak tercetak.
+      </div>
+    </div>
 
-    async function setRoleForUser(){
-      if(!user || role!=="admin"){ alert("Admin saja."); return; }
-      const uid = $("newUid").value.trim();
-      const r = $("newRole").value;
-      if(!uid){ alert("Isi UID dulu."); return; }
-      await set(ref(db, `roles/${uid}`), r);
-      alert(`Role diset: ${uid} = ${r}`);
-    }
+    <!-- PRINT AREA -->
+    <div id="printArea" class="paper-wrap">
+      <div class="paper" id="paper">
+        <div class="muted">Isi data dulu untuk melihat preview.</div>
+      </div>
+    </div>
+  </section>
 
-    // ====== Navigation ======
-    function nav(to){
-      // pages
-      const pages = {
-        login: ["pageLogin", "Login", "Masuk pakai akun Firebase (Email/Password)."],
-        buat:  ["pageBuat",  "Buat STSU", "Isi transaksi → nomor STSU otomatis → preview A4. Simpan draft dulu."],
-        dash:  ["pageDash",  "Dashboard", "Ringkasan pendapatan (filter bulan / jenis)."],
-        settings:["pageSettings","Settings (Admin)", "Kategori & template, nama penandatangan, role user."]
-      };
+</main>
 
-      Object.values(pages).forEach(([id])=>show($(id), false));
-      const [pid, title, sub] = pages[to];
-      show($(pid), true);
-      $("pageTitle").textContent = title;
-      $("pageSub").textContent = sub;
-      openDrawer(false);
-
-      // preview refresh
-      renderPreview();
-    }
-
-    // drawer click
-    document.querySelectorAll(".navcard[data-nav]").forEach(el=>{
-      el.onclick = ()=> nav(el.dataset.nav);
-    });
-
-    // ====== Auth Actions ======
-    $("btnLogin").onclick = async ()=>{
-      try{
-        const email = $("loginEmail").value.trim();
-        const pass = $("loginPass").value;
-        await signInWithEmailAndPassword(auth, email, pass);
-      }catch(e){
-        alert("Login gagal: "+e.message);
-      }
-    };
-
-    $("btnLogout").onclick = async ()=>{
-      await signOut(auth);
-    };
-
-    $("btnReset").onclick = async ()=>{
-      const email = $("loginEmail").value.trim();
-      if(!email){ alert("Isi email dulu."); return; }
-      await sendPasswordResetEmail(auth, email);
-      alert("Link reset terkirim (cek email).");
-    };
-
-    // ====== Form bindings ======
-    $("jenis").onchange = (e)=>{ state.jenis = e.target.value; state.nomor=""; $("nomor").value=""; renderPreview(); };
-    $("tglTransaksi").onchange = (e)=>{ state.tglTransaksi = e.target.value; state.nomor=""; $("nomor").value=""; renderPreview(); };
-    $("tglSTSU").onchange = (e)=>{ state.tglSTSU = e.target.value; renderPreview(); };
-
-    $("btnMakeNo").onclick = genNomorByTanggal;
-    $("btnSaveDraft").onclick = saveDraft;
-    $("btnPrint").onclick = ()=>{
-      // sebelum print, pastikan preview up-to-date
-      renderPreview();
-      window.print();
-    };
-    $("btnDashLoad").onclick = loadDashboard;
-
-    $("btnSaveSig").onclick = saveSignature;
-    $("btnSetRole").onclick = setRoleForUser;
-
-    // ====== Load role from RTDB ======
-    async function loadRole(uid){
-      const snap = await get(ref(db, `roles/${uid}`));
-      if(snap.exists()) return snap.val();
-      return "user";
-    }
-
-    // ====== Init ======
-    function initFresh(){
-      state = { jenis:"R", tglTransaksi:"", tglSTSU:"", nomor:"", sections: cloneDefaults() };
-      $("jenis").value = "R";
-      $("tglTransaksi").value = "";
-      $("tglSTSU").value = "";
-      $("nomor").value = "";
-      renderSectionsEditor();
-      renderPreview();
-    }
-
-    onAuthStateChanged(auth, async (u)=>{
-      user = u || null;
-
-      if(!user){
-        role = "user";
-        $("authPill").innerHTML = `Auth: <b>OFF</b>`;
-        $("badgeStatus").className = "badge warn";
-        $("badgeStatus").textContent = "BELUM LOGIN";
-        $("roleBadge").textContent = "role: -";
-        $("statUid").value = "";
-        $("statEmail").value = "";
-        $("navSettings").style.display = "none";
-        initFresh();
-        nav("login");
-        return;
-      }
-
-      $("authPill").innerHTML = `Auth: <b>ON</b>`;
-      $("badgeStatus").className = "badge ok";
-      $("badgeStatus").textContent = "LOGIN ✅";
-      $("statUid").value = user.uid;
-      $("statEmail").value = user.email || "";
-      role = await loadRole(user.uid);
-
-      $("roleBadge").textContent = "role: " + role;
-      $("navSettings").style.display = (role==="admin") ? "flex" : "none";
-
-      await loadSignatureSettings();
-      $("setKasi").value = cachedSig.kasi || "";
-      $("setBend").value = cachedSig.bend || "";
-
-      initFresh();
-      nav("buat");
-    });
-
-    // ====== Utils ======
-    function escapeHtml(s){
-      return String(s||"").replace(/[&<>"']/g, (m)=>({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-  </script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script type="module" src="./app.js"></script>
 </body>
 </html>
