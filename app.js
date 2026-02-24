@@ -140,7 +140,7 @@ const DEFAULT_SECTIONS = [
 /** ================== STATE ================== */
 let user = null;
 let role = "user";
-let currentEditingId = null;     // stsuId kalau sedang edit draft/final
+let currentEditingId = null;     // stsuId
 let chartDaily = null;
 
 /** ================== AUTH UI ================== */
@@ -199,17 +199,15 @@ onAuthStateChanged(auth, async (u)=>{
   $("stUid").textContent=user.uid;
   $("stEmail").textContent=user.email || "-";
 
-  // role dari RTDB (opsional)
+  // role (opsional)
   const rs = await get(ref(db, `roles/${user.uid}`));
   role = rs.exists() ? rs.val() : "user";
   $("roleText").textContent = role;
   $("stRole").textContent = role;
 
-  // init form
   resetBuatForm();
   renderSections(DEFAULT_SECTIONS);
 
-  // default nama (boleh kamu ganti)
   $("namaKasi").value = $("namaKasi").value || "NAMA KEPALA SEKSI";
   $("namaBend").value = $("namaBend").value || "NAMA BENDAHARA";
 
@@ -217,7 +215,7 @@ onAuthStateChanged(auth, async (u)=>{
   await loadLast10();
 });
 
-/** ================== CLEAN: ignore nominal 0 ================== */
+/** ================== COLLECT (ignore 0) ================== */
 function collectForm(){
   const jenis = $("jenis").value;
   const tglTransaksi = $("tglTransaksi").value;
@@ -229,21 +227,19 @@ function collectForm(){
   document.querySelectorAll("#sectionsWrap .sectionCard").forEach(card=>{
     const enabled = card.querySelector(".secEnabled")?.checked ?? true;
     const title = card.querySelector(".sectionTitle")?.textContent?.trim() || "Section";
+    if(!enabled) return;
 
     const items = [];
     card.querySelectorAll(".itemRow").forEach(r=>{
       const label = (r.querySelector(".itName")?.value || "").trim();
       const nominal = toNumber(r.querySelector(".itVal")?.value);
 
-      // IGNORE 0
       if(!label) return;
-      if(!nominal || nominal <= 0) return;
+      if(!nominal || nominal <= 0) return; // IGNORE 0
 
       items.push({ label, nominal });
     });
 
-    // section kosong tidak ditampilkan di print dan tidak disimpan (kecuali kamu mau simpan kosong — kamu minta jangan)
-    if(!enabled) return;
     if(items.length === 0) return;
 
     const subtotal = items.reduce((a,i)=>a+Number(i.nominal||0),0);
@@ -251,12 +247,16 @@ function collectForm(){
   });
 
   const total = sections.reduce((a,s)=>a+Number(s.subtotal||0),0);
-
   return { jenis, tglTransaksi, tglStsu, kasi, bend, sections, total };
 }
 
+/** ================== PATH HELPERS (SEMUA DI BAWAH UID) ================== */
+function pathStsu(uid){ return `stsu/${uid}`; }
+function pathIndex(uid){ return `stsu_index/${uid}`; }
+function pathCounters(uid){ return `counters/${uid}`; }
+
 /** ================== NOMOR: preview vs booking ================== */
-async function previewNextNo({ tglTransaksi, jenis }){
+async function previewNextNo({ uid, tglTransaksi, jenis }){
   if(!tglTransaksi) throw new Error("Tanggal transaksi wajib diisi.");
 
   const year = tglTransaksi.slice(0,4);
@@ -264,15 +264,15 @@ async function previewNextNo({ tglTransaksi, jenis }){
   const mm = tglTransaksi.slice(5,7);
   const jenisKey = (jenis === "Lainnya") ? "L" : "SU";
 
-  const snap = await get(ref(db, `counters/${year}/${jenisKey}`));
+  const snap = await get(ref(db, `${pathCounters(uid)}/${year}/${jenisKey}`));
   const cur = snap.exists() ? Number(snap.val() || 0) : 0;
   const next = cur + 1; // preview only
 
   return `${next}/${dd}/${mm}/${jenisKey}/${year}`;
 }
 
-// BOOKING nomor: counter naik (dipanggil saat SIMPAN DRAFT)
-async function bookNo({ tglTransaksi, jenis }){
+// booking: counter NAIK (dipanggil hanya saat simpan draft)
+async function bookNo({ uid, tglTransaksi, jenis }){
   if(!tglTransaksi) throw new Error("Tanggal transaksi wajib diisi.");
 
   const year = tglTransaksi.slice(0,4);
@@ -280,17 +280,17 @@ async function bookNo({ tglTransaksi, jenis }){
   const mm = tglTransaksi.slice(5,7);
   const jenisKey = (jenis === "Lainnya") ? "L" : "SU";
 
-  const counterRef = ref(db, `counters/${year}/${jenisKey}`);
+  const counterRef = ref(db, `${pathCounters(uid)}/${year}/${jenisKey}`);
   const tx = await runTransaction(counterRef, (cur)=>{
     const c = Number(cur || 0);
-    return c + 1; // booking
+    return c + 1;
   });
 
   const issued = Number(tx.snapshot.val());
   return `${issued}/${dd}/${mm}/${jenisKey}/${year}`;
 }
 
-/** ================== RENDER SECTIONS UI ================== */
+/** ================== UI: SECTIONS ================== */
 function makeItemRow(label="", nominal=""){
   const row = document.createElement("div");
   row.className = "itemRow";
@@ -299,10 +299,7 @@ function makeItemRow(label="", nominal=""){
     <input class="itVal" placeholder="Nominal" inputmode="numeric" value="${escapeHtml(nominal)}">
     <button class="btn danger" type="button">Hapus</button>
   `;
-  row.querySelector(".btn.danger").addEventListener("click", ()=>{
-    row.remove();
-    refreshPreview();
-  });
+  row.querySelector(".btn.danger").addEventListener("click", ()=>{ row.remove(); refreshPreview(); });
   row.querySelector(".itName").addEventListener("input", refreshPreview);
   row.querySelector(".itVal").addEventListener("input", refreshPreview);
   return row;
@@ -329,10 +326,7 @@ function renderSections(sectionTemplates){
       <div class="items"></div>
     `;
     const itemsEl = card.querySelector(".items");
-
-    (sec.items||[]).forEach(name=>{
-      itemsEl.appendChild(makeItemRow(name, ""));
-    });
+    (sec.items||[]).forEach(name=> itemsEl.appendChild(makeItemRow(name, "")));
 
     card.querySelector("[data-add]").addEventListener("click", ()=>{
       itemsEl.appendChild(makeItemRow("", ""));
@@ -346,7 +340,6 @@ function renderSections(sectionTemplates){
   refreshPreview();
 }
 
-// tambah section custom (muncul di atas E-ticketing sesuai request kamu dulu)
 $("btnAddSection").addEventListener("click", ()=>{
   const name = prompt("Nama Section baru?");
   if(!name) return;
@@ -358,7 +351,7 @@ $("btnAddSection").addEventListener("click", ()=>{
     <div class="sectionHead">
       <div>
         <div class="sectionTitle">${escapeHtml(name)}</div>
-        <div class="sectionMeta">Custom section (bisa tambah/hapus baris).</div>
+        <div class="sectionMeta">Custom section.</div>
       </div>
       <div class="sectionActions">
         <label class="switch">Aktif <input class="secEnabled" type="checkbox" checked></label>
@@ -371,23 +364,17 @@ $("btnAddSection").addEventListener("click", ()=>{
   const itemsEl = card.querySelector(".items");
   itemsEl.appendChild(makeItemRow("", ""));
 
-  card.querySelector("[data-add]").addEventListener("click", ()=>{
-    itemsEl.appendChild(makeItemRow("", ""));
-    refreshPreview();
-  });
+  card.querySelector("[data-add]").addEventListener("click", ()=>{ itemsEl.appendChild(makeItemRow("", "")); refreshPreview(); });
   card.querySelector(".secEnabled").addEventListener("change", refreshPreview);
-  card.querySelector("[data-del]").addEventListener("click", ()=>{
-    card.remove(); refreshPreview();
-  });
+  card.querySelector("[data-del]").addEventListener("click", ()=>{ card.remove(); refreshPreview(); });
 
-  // sisipkan setelah section pertama (fasilitas) biar “di atas E-ticketing”
   const afterFirst = wrap.children[1] || null;
   wrap.insertBefore(card, afterFirst);
 
   refreshPreview();
 });
 
-/** ================== PREVIEW / PRINT RENDER ================== */
+/** ================== PREVIEW ================== */
 function renderPaper({ noStsu, status, data }){
   const lines = [];
   lines.push(`<div class="a4-title">SURAT TANDA SETOR UANG</div>`);
@@ -396,7 +383,6 @@ function renderPaper({ noStsu, status, data }){
   data.sections.forEach(sec=>{
     lines.push(`<table class="a4-table">`);
     lines.push(`<tr><td class="a4-sec" colspan="2">${escapeHtml(sec.title)}</td></tr>`);
-
     sec.items.forEach(it=>{
       lines.push(`
         <tr>
@@ -422,18 +408,13 @@ function renderPaper({ noStsu, status, data }){
   });
 
   lines.push(`
-    <div class="a4-total">
-      <div>JUMLAH TOTAL</div>
-      <div>${rupiah(data.total)}</div>
-    </div>
+    <div class="a4-total"><div>JUMLAH TOTAL</div><div>${rupiah(data.total)}</div></div>
     <div class="a4-terbilang"><b>Terbilang :</b> ${escapeHtml(terbilang(data.total))}</div>
   `);
 
-  // Penutup hanya Retribusi
   if(data.jenis === "Retribusi"){
     const hari = data.tglTransaksi ? dayNameIndonesia(data.tglTransaksi) : "....";
     const tglShort = data.tglTransaksi ? isoShort(data.tglTransaksi) : "....";
-
     lines.push(`
       <div class="a4-penutup">
         Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR
@@ -466,15 +447,12 @@ function refreshPreview(){
   clearMsg($("buatMsg"));
   const form = collectForm();
 
-  // jangan render kalau belum isi tgl transaksi
   if(!form.tglTransaksi){
     $("paper").innerHTML = `<div class="muted">Isi tanggal transaksi untuk mulai.</div>`;
     return;
   }
-
-  // kalau belum ada item >0
   if(form.total <= 0){
-    $("paper").innerHTML = `<div class="muted">Isi minimal 1 item nominal &gt; 0 untuk preview.</div>`;
+    $("paper").innerHTML = `<div class="muted">Isi minimal 1 item nominal > 0 untuk preview.</div>`;
     return;
   }
 
@@ -484,20 +462,16 @@ function refreshPreview(){
 
 /** ================== BUTTONS ================== */
 $("btnPreview").addEventListener("click", refreshPreview);
+$("btnPrint").addEventListener("click", ()=>{ refreshPreview(); window.print(); });
 
-$("btnPrint").addEventListener("click", ()=>{
-  refreshPreview();
-  window.print();
-});
-
-// Refresh nomor = preview only (tidak naik counter)
+// Refresh nomor = preview (NO counter increment)
 $("btnRefreshNo").addEventListener("click", async ()=>{
   clearMsg($("buatMsg"));
-  const jenis = $("jenis").value;
-  const tglTransaksi = $("tglTransaksi").value;
+  if(!user) return;
 
   try{
-    const previewNo = await previewNextNo({ tglTransaksi, jenis });
+    const form = collectForm();
+    const previewNo = await previewNextNo({ uid: user.uid, tglTransaksi: form.tglTransaksi, jenis: form.jenis });
     $("noStsu").value = previewNo;
     msg($("buatMsg"), "Nomor (preview) dibuat. Counter belum naik.", true);
     refreshPreview();
@@ -506,7 +480,7 @@ $("btnRefreshNo").addEventListener("click", async ()=>{
   }
 });
 
-// Simpan Draft = booking nomor (counter naik) + tampil di dashboard
+// Simpan Draft = BOOKING nomor (counter naik) + simpan ke UID path
 $("btnSaveDraft").addEventListener("click", async ()=>{
   clearMsg($("buatMsg"));
   if(!user) return;
@@ -516,17 +490,15 @@ $("btnSaveDraft").addEventListener("click", async ()=>{
   if(form.total <= 0) return msg($("buatMsg"), "Total 0 tidak boleh disimpan. Isi minimal 1 item > 0.", false);
 
   try{
-    // kalau edit draft yang sudah ada -> jangan booking nomor lagi
-    // (kalau kamu mau behavior beda, bilang ya)
     let noStsu = $("noStsu").value || "";
 
+    // jika NEW: booking nomor (counter naik)
     if(!currentEditingId){
-      // booking nomor resmi (counter naik)
-      noStsu = await bookNo({ tglTransaksi: form.tglTransaksi, jenis: form.jenis });
+      noStsu = await bookNo({ uid: user.uid, tglTransaksi: form.tglTransaksi, jenis: form.jenis });
       $("noStsu").value = noStsu;
     }else{
-      // kalau sedang edit existing STSU, pertahankan nomor
-      const snap = await get(ref(db, `stsu/${currentEditingId}`));
+      // EDIT existing: pertahankan nomor
+      const snap = await get(ref(db, `${pathStsu(user.uid)}/${currentEditingId}`));
       if(snap.exists()){
         noStsu = snap.val().noStsu || $("noStsu").value;
         $("noStsu").value = noStsu;
@@ -535,10 +507,9 @@ $("btnSaveDraft").addEventListener("click", async ()=>{
 
     const now = Date.now();
 
-    // Simpan ke stsu
     let stsuId = currentEditingId;
     if(!stsuId){
-      stsuId = push(ref(db, "stsu")).key;
+      stsuId = push(ref(db, pathStsu(user.uid))).key;
       currentEditingId = stsuId;
     }
 
@@ -571,21 +542,20 @@ $("btnSaveDraft").addEventListener("click", async ()=>{
     };
 
     const updates = {};
-    updates[`stsu/${stsuId}`] = payload;
-    updates[`stsu_index/${stsuId}`] = indexPayload;
+    updates[`${pathStsu(user.uid)}/${stsuId}`] = payload;
+    updates[`${pathIndex(user.uid)}/${stsuId}`] = indexPayload;
 
     await update(ref(db), updates);
 
     $("buatBadge").textContent = "DRAFT";
     msg($("buatMsg"), `Draft tersimpan ✅ Nomor resmi: ${noStsu}`, true);
     refreshPreview();
-
   }catch(e){
     msg($("buatMsg"), "Gagal simpan draft: " + (e?.message||e), false);
   }
 });
 
-// Final = ubah status jadi FINAL (tanpa booking nomor lagi)
+// Final = ubah status (tidak booking nomor lagi)
 $("btnFinal").addEventListener("click", async ()=>{
   clearMsg($("buatMsg"));
   if(!user) return;
@@ -597,12 +567,12 @@ $("btnFinal").addEventListener("click", async ()=>{
     const tglStsu = $("tglStsu").value || "";
 
     const updates = {};
-    updates[`stsu/${currentEditingId}/status`] = "FINAL";
-    updates[`stsu/${currentEditingId}/tglStsu`] = tglStsu;
-    updates[`stsu/${currentEditingId}/updatedAt`] = now;
+    updates[`${pathStsu(user.uid)}/${currentEditingId}/status`] = "FINAL";
+    updates[`${pathStsu(user.uid)}/${currentEditingId}/tglStsu`] = tglStsu;
+    updates[`${pathStsu(user.uid)}/${currentEditingId}/updatedAt`] = now;
 
-    updates[`stsu_index/${currentEditingId}/status`] = "FINAL";
-    updates[`stsu_index/${currentEditingId}/updatedAt`] = now;
+    updates[`${pathIndex(user.uid)}/${currentEditingId}/status`] = "FINAL";
+    updates[`${pathIndex(user.uid)}/${currentEditingId}/updatedAt`] = now;
 
     await update(ref(db), updates);
 
@@ -614,7 +584,7 @@ $("btnFinal").addEventListener("click", async ()=>{
   }
 });
 
-/** ================== RESET FORM BUAT ================== */
+/** ================== RESET FORM ================== */
 function resetBuatForm(){
   currentEditingId = null;
   $("buatBadge").textContent = "DRAFT";
@@ -626,13 +596,11 @@ function resetBuatForm(){
   $("paper").innerHTML = `<div class="muted">Isi data dulu untuk melihat preview.</div>`;
 }
 
-/** ================== DASHBOARD (last 10 + search tanggal) ================== */
+/** ================== DASHBOARD (last 10 + search by tanggal) ================== */
 $("btnLoadLast10").addEventListener("click", loadLast10);
 $("btnSearchTanggal").addEventListener("click", searchByTanggal);
 
-$("qJenis").addEventListener("change", ()=> {
-  // re-render list dari cache terakhir? paling gampang: muat ulang last10
-  // biar simple: kalau user sudah isi tanggal, search; kalau tidak, last10
+$("qJenis").addEventListener("change", ()=>{
   if($("qTanggal").value) searchByTanggal();
   else loadLast10();
 });
@@ -641,16 +609,14 @@ async function loadLast10(){
   if(!user) return;
   $("dashInfo").textContent = "Memuat...";
 
-  const q = query(ref(db, "stsu_index"), orderByChild("createdAt"), limitToLast(10));
+  const q = query(ref(db, pathIndex(user.uid)), orderByChild("createdAt"), limitToLast(10));
   const snap = await get(q);
   const val = snap.val() || {};
   let arr = Object.values(val);
 
-  // filter by jenis
   const jenis = $("qJenis").value;
   if(jenis !== "ALL") arr = arr.filter(x=>x.jenis === jenis);
 
-  // urut newest
   arr.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
   renderDashboardList(arr, `Menampilkan ${arr.length} dari 10 terakhir`);
 }
@@ -663,20 +629,19 @@ async function searchByTanggal(){
   $("dashInfo").textContent = "Mencari...";
 
   const q = query(
-    ref(db, "stsu_index"),
+    ref(db, pathIndex(user.uid)),
     orderByChild("tglTransaksi"),
     startAt(tgl),
     endAt(tgl + "\uf8ff")
   );
+
   const snap = await get(q);
   const val = snap.val() || {};
   let arr = Object.values(val);
 
-  // filter by jenis
   const jenis = $("qJenis").value;
   if(jenis !== "ALL") arr = arr.filter(x=>x.jenis === jenis);
 
-  // urut newest
   arr.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
   renderDashboardList(arr, `Hasil search tanggal ${isoShort(tgl)}: ${arr.length} data`);
 }
@@ -690,7 +655,6 @@ function renderDashboardList(arr, infoText){
   $("sumTotal").textContent = rupiah(total);
   $("dashInfo").textContent = infoText;
 
-  // chart
   renderChart(arr);
 
   arr.forEach(x=>{
@@ -708,15 +672,11 @@ function renderDashboardList(arr, infoText){
       </div>
     `;
 
-    row.querySelector('[data-act="open"]').addEventListener("click", async ()=>{
-      await openStsu(x.stsuId);
-    });
-
+    row.querySelector('[data-act="open"]').addEventListener("click", async ()=>{ await openStsu(x.stsuId); });
     row.querySelector('[data-act="del"]').addEventListener("click", async ()=>{
       if(!confirm("Hapus STSU ini?")) return;
-      await remove(ref(db, `stsu/${x.stsuId}`));
-      await remove(ref(db, `stsu_index/${x.stsuId}`));
-      // refresh current list context
+      await remove(ref(db, `${pathStsu(user.uid)}/${x.stsuId}`));
+      await remove(ref(db, `${pathIndex(user.uid)}/${x.stsuId}`));
       if($("qTanggal").value) await searchByTanggal();
       else await loadLast10();
     });
@@ -726,14 +686,13 @@ function renderDashboardList(arr, infoText){
 }
 
 async function openStsu(stsuId){
-  const snap = await get(ref(db, `stsu/${stsuId}`));
+  const snap = await get(ref(db, `${pathStsu(user.uid)}/${stsuId}`));
   if(!snap.exists()){
     alert("Data STSU tidak ditemukan.");
     return;
   }
   const d = snap.val();
 
-  // pindah ke page buat
   showPage("buat");
 
   currentEditingId = stsuId;
@@ -746,7 +705,6 @@ async function openStsu(stsuId){
   $("namaKasi").value = d.kasi || "NAMA KEPALA SEKSI";
   $("namaBend").value = d.bend || "NAMA BENDAHARA";
 
-  // render sections from saved data (langsung persis data tersimpan)
   const wrap = $("sectionsWrap");
   wrap.innerHTML = "";
 
@@ -767,14 +725,9 @@ async function openStsu(stsuId){
       <div class="items"></div>
     `;
     const itemsEl = card.querySelector(".items");
-    (sec.items||[]).forEach(it=>{
-      itemsEl.appendChild(makeItemRow(it.label, String(it.nominal)));
-    });
+    (sec.items||[]).forEach(it=> itemsEl.appendChild(makeItemRow(it.label, String(it.nominal))));
 
-    card.querySelector("[data-add]").addEventListener("click", ()=>{
-      itemsEl.appendChild(makeItemRow("", ""));
-      refreshPreview();
-    });
+    card.querySelector("[data-add]").addEventListener("click", ()=>{ itemsEl.appendChild(makeItemRow("", "")); refreshPreview(); });
     card.querySelector(".secEnabled").addEventListener("change", refreshPreview);
 
     wrap.appendChild(card);
@@ -788,7 +741,6 @@ function renderChart(arr){
   const ctx = $("chartDaily");
   if(!ctx) return;
 
-  // group by tglTransaksi (from current list)
   const byDate = {};
   for(const x of arr){
     const t = x.tglTransaksi || "";
@@ -800,25 +752,15 @@ function renderChart(arr){
   const labels = keys.map(isoShort);
   const values = keys.map(k=>byDate[k]);
 
-  if(chartDaily){
-    chartDaily.destroy();
-    chartDaily = null;
-  }
+  if(chartDaily){ chartDaily.destroy(); chartDaily = null; }
 
   chartDaily = new Chart(ctx, {
     type:"line",
-    data:{
-      labels,
-      datasets:[{ label:"Pendapatan", data: values }]
-    },
+    data:{ labels, datasets:[{ label:"Pendapatan", data: values }] },
     options:{
       responsive:true,
-      plugins:{ legend:{ display:true }},
-      scales:{
-        y:{
-          ticks:{ callback:(v)=> "Rp " + Number(v).toLocaleString("id-ID") }
-        }
-      }
+      plugins:{ legend:{ display:true } },
+      scales:{ y:{ ticks:{ callback:(v)=> "Rp " + Number(v).toLocaleString("id-ID") } } }
     }
   });
 }
@@ -826,8 +768,6 @@ function renderChart(arr){
 /** ================== INIT EXTRA ================== */
 $("jenis").addEventListener("change", ()=>{ refreshPreview(); });
 $("tglTransaksi").addEventListener("change", ()=>{
-  // kalau tanggal berubah, nomor preview lama jangan bikin bingung
-  // kita kosongkan nomor (biar user klik refresh atau simpan draft)
   if(!currentEditingId) $("noStsu").value = "";
   refreshPreview();
 });
