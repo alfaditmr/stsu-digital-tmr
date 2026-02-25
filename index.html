@@ -1,237 +1,187 @@
 <!doctype html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>STSU Digital</title>
-  <link rel="stylesheet" href="./styles.css">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>STSU Digital TMR</title>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import {
+  getAuth,onAuthStateChanged,
+  signInWithEmailAndPassword,signOut
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import {
+  getDatabase,ref,get,set,push,remove,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+/* ================= FIREBASE CONFIG ================= */
+/* GANTI DENGAN PUNYA KAMU */
+const firebaseConfig = {
+  apiKey: "ISI_APIKEY",
+  authDomain: "ISI_AUTHDOMAIN",
+  databaseURL: "ISI_DATABASEURL",
+  projectId: "ISI_PROJECTID",
+  storageBucket: "ISI_BUCKET",
+  messagingSenderId: "ISI_MSGID",
+  appId: "ISI_APPID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let user=null;
+let role="admin";
+
+const $ = id=>document.getElementById(id);
+
+/* ================= FORMAT RUPIAH ================= */
+function formatRp(n){
+  return new Intl.NumberFormat("id-ID").format(n||0);
+}
+function parseRp(v){
+  return parseInt(String(v).replace(/\D/g,''))||0;
+}
+window.formatInput=(e)=>{
+  const val=parseRp(e.value);
+  e.value=formatRp(val);
+}
+
+/* ================= AUTH ================= */
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){
+    $("loginBox").style.display="block";
+    $("appBox").style.display="none";
+    return;
+  }
+  user=u;
+  const snap=await get(ref(db,"users/"+u.uid));
+  role=snap.val()?.role||"admin";
+  $("roleText").innerText=role;
+  $("loginBox").style.display="none";
+  $("appBox").style.display="block";
+  loadDashboard();
+});
+
+window.login=async()=>{
+  await signInWithEmailAndPassword(auth,$("email").value,$("pass").value);
+}
+window.logout=async()=>{ await signOut(auth); }
+
+/* ================= COUNTER ================= */
+async function nextSeq(jenis,tgl){
+  const year=tgl.split("-")[0];
+  const r=ref(db,"counters/"+year+"/"+jenis+"/seq");
+  const res=await runTransaction(r,(cur)=>{
+    if(cur==null) return 1;
+    return cur+1;
+  });
+  return res.snapshot.val();
+}
+
+/* ================= SAVE ================= */
+window.saveStsu=async()=>{
+  const jenis=$("jenis").value;
+  const tgl=$("tgl").value;
+  if(!tgl) return alert("Tanggal wajib diisi");
+
+  const nominal=parseRp($("nominal").value);
+  if(nominal<=0) return alert("Nominal harus > 0");
+
+  const seq=await nextSeq(jenis,tgl);
+  const no=seq+"/"+tgl;
+
+  const id=push(ref(db,"stsu/"+user.uid)).key;
+
+  const data={
+    id,
+    uid:user.uid,
+    jenis,
+    tgl,
+    nominal,
+    noStsu:no,
+    status:"DRAFT",
+    createdAt:Date.now()
+  };
+
+  await set(ref(db,"stsu/"+user.uid+"/"+id),data);
+  await set(ref(db,"stsu_index/"+user.uid+"/"+id),data);
+
+  alert("Tersimpan");
+  $("nominal").value="";
+  loadDashboard();
+}
+
+/* ================= DASHBOARD ================= */
+async function loadDashboard(){
+  let arr=[];
+  if(role==="admin"){
+    const snap=await get(ref(db,"stsu_index"));
+    const val=snap.val()||{};
+    Object.values(val).forEach(u=>{
+      Object.values(u).forEach(x=>arr.push(x));
+    });
+  }else{
+    const snap=await get(ref(db,"stsu_index/"+user.uid));
+    arr=Object.values(snap.val()||{});
+  }
+  arr.sort((a,b)=>b.createdAt-a.createdAt);
+  renderDash(arr);
+}
+
+function renderDash(arr){
+  const box=$("dash");
+  box.innerHTML="";
+  arr.forEach(x=>{
+    box.innerHTML+=`
+    <div style="border:1px solid #ddd;padding:10px;margin:5px;border-radius:8px">
+      <b>${x.noStsu}</b><br>
+      ${x.jenis} | ${x.tgl}<br>
+      Rp ${formatRp(x.nominal)}<br>
+      <button onclick="deleteStsu('${x.uid}','${x.id}')">Delete</button>
+    </div>`;
+  });
+}
+
+/* ================= DELETE ================= */
+window.deleteStsu=async(uid,id)=>{
+  if(!confirm("Hapus data?")) return;
+  await remove(ref(db,"stsu/"+uid+"/"+id));
+  await remove(ref(db,"stsu_index/"+uid+"/"+id));
+  loadDashboard();
+}
+</script>
 </head>
-<body>
 
-<header class="topbar no-print">
-  <div class="brand">
-    <div class="logo">SU</div>
-    <div>
-      <div class="brand-title">STSU Digital</div>
-      <div class="brand-sub">Login • Draft • Dashboard • Cetak A4</div>
-    </div>
-  </div>
+<body style="font-family:Arial;padding:20px;background:#f5f5f5">
 
-  <div class="top-actions">
-    <span id="authBadge" class="badge">Auth: OFF</span>
-    <button id="btnMenu" class="iconbtn" aria-label="Menu">☰</button>
-  </div>
-</header>
+<div id="loginBox">
+  <h2>Login STSU</h2>
+  <input id="email" placeholder="Email"><br><br>
+  <input id="pass" type="password" placeholder="Password"><br><br>
+  <button onclick="login()">Login</button>
+</div>
 
-<!-- Drawer -->
-<div id="backdrop" class="backdrop hidden no-print"></div>
-<aside id="drawer" class="drawer hidden no-print">
-  <div class="drawer-head">
-    <div class="drawer-title">Menu</div>
-    <button id="btnCloseMenu" class="btn">Tutup</button>
-  </div>
+<div id="appBox" style="display:none">
+  <h2>STSU Digital (Role: <span id="roleText"></span>)</h2>
+  <button onclick="logout()">Logout</button>
+  <hr>
 
-  <div class="drawer-body">
-    <button class="nav" data-go="dashboard">
-      <div class="nav-title">Dashboard</div>
-      <div class="nav-sub">10 STSU terakhir + search tanggal</div>
-    </button>
-    <button class="nav" data-go="buat">
-      <div class="nav-title">Buat STSU</div>
-      <div class="nav-sub">Input + preview + simpan draft + final</div>
-    </button>
-  </div>
+  <h3>Buat STSU</h3>
+  <select id="jenis">
+    <option value="retribusi">Retribusi</option>
+    <option value="lainnya">Lainnya</option>
+  </select><br><br>
+  <input type="date" id="tgl"><br><br>
+  <input id="nominal" oninput="formatInput(this)" placeholder="Nominal"><br><br>
+  <button onclick="saveStsu()">Simpan</button>
 
-  <div class="drawer-foot">
-    <div class="pill">UID: <b id="uidText">-</b></div>
-    <div class="pill">Role: <b id="roleText">-</b></div>
-    <button id="btnLogout" class="btn danger">Logout</button>
-  </div>
-</aside>
+  <hr>
+  <h3>Dashboard</h3>
+  <div id="dash"></div>
+</div>
 
-<main class="container">
-
-  <!-- LOGIN -->
-  <section id="page-login" class="page">
-    <div class="card">
-      <h2>Login</h2>
-      <p class="muted">Masuk pakai Firebase Authentication (Email/Password).</p>
-
-      <div class="grid2">
-        <div>
-          <label>Email</label>
-          <input id="loginEmail" type="email" placeholder="email@..." autocomplete="username">
-        </div>
-        <div>
-          <label>Password</label>
-          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
-        </div>
-      </div>
-
-      <div class="row">
-        <button id="btnLogin" class="btn primary">Login</button>
-        <button id="btnReset" class="btn">Lupa Password</button>
-      </div>
-
-      <div id="loginMsg" class="msg"></div>
-
-      <div class="hr"></div>
-
-      <div class="pill">Auth: <b id="stAuth">OFF</b></div>
-      <div class="pill">UID: <b id="stUid">-</b></div>
-      <div class="pill">Email: <b id="stEmail">-</b></div>
-      <div class="pill">Role: <b id="stRole">-</b></div>
-    </div>
-  </section>
-
-  <!-- DASHBOARD -->
-  <section id="page-dashboard" class="page hidden">
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <h2>Dashboard</h2>
-          <p class="muted">Menampilkan <b>10 STSU terakhir</b> (DRAFT & FINAL). Cari lainnya via tanggal transaksi.</p>
-        </div>
-        <span class="badge" id="dashBadge">READY</span>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Search Tanggal Transaksi</label>
-          <input id="qTanggal" type="date">
-          <div class="muted">Pakai ini untuk mencari STSU di luar 10 terakhir.</div>
-        </div>
-        <div>
-          <label>Jenis</label>
-          <select id="qJenis">
-            <option value="ALL">Semua</option>
-            <option value="Retribusi">Retribusi</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-          <div class="muted">Filter jenis di hasil list.</div>
-        </div>
-      </div>
-
-      <div class="row">
-        <button id="btnLoadLast10" class="btn primary">Muat 10 Terakhir</button>
-        <button id="btnSearchTanggal" class="btn">Search Tanggal</button>
-      </div>
-
-      <div class="summary">
-        <div class="pill">Jumlah: <b id="sumCount">0</b></div>
-        <div class="pill">Total: <b id="sumTotal">Rp 0</b></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Grafik Pendapatan (Hasil List Saat Ini)</h3>
-      <canvas id="chartDaily" height="120"></canvas>
-      <p class="muted">Grafik dijumlahkan per tanggal transaksi dari list yang sedang tampil.</p>
-    </div>
-
-    <div class="card">
-      <div class="table">
-        <div class="thead">
-          <div>No STSU</div>
-          <div>Tgl Transaksi</div>
-          <div>Jenis</div>
-          <div>Status</div>
-          <div class="tr">Total</div>
-          <div class="tr">Aksi</div>
-        </div>
-        <div id="stsuList" class="tbody"></div>
-      </div>
-      <div class="muted" id="dashInfo"></div>
-    </div>
-  </section>
-
-  <!-- BUAT -->
-  <section id="page-buat" class="page hidden">
-    <div class="card no-print">
-      <div class="card-head">
-        <div>
-          <h2>Buat STSU</h2>
-          <p class="muted">
-            <b>Refresh Nomor</b> hanya preview (tidak menaikkan counter).
-            <b>Simpan Draft</b> akan booking nomor (counter naik) dan muncul di dashboard.
-          </p>
-        </div>
-        <span class="badge" id="buatBadge">DRAFT</span>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Jenis STSU</label>
-          <select id="jenis">
-            <option value="Retribusi">Retribusi</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-        <div>
-          <label>Tanggal Transaksi (penentu nomor)</label>
-          <input id="tglTransaksi" type="date">
-        </div>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Tanggal STSU/TTD (boleh kosong dulu)</label>
-          <input id="tglStsu" type="date">
-          <div class="muted">Boleh diisi belakangan (draft). Final bisa dilakukan kapan saja.</div>
-        </div>
-        <div>
-          <label>No STSU</label>
-          <input id="noStsu" type="text" disabled placeholder="Klik Refresh / Simpan Draft">
-          <div class="muted">Refresh = preview. Simpan Draft = nomor resmi.</div>
-        </div>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label>Nama Kepala Seksi</label>
-          <input id="namaKasi" placeholder="Nama Kepala Seksi">
-        </div>
-        <div>
-          <label>Nama Bendahara</label>
-          <input id="namaBend" placeholder="Nama Bendahara">
-        </div>
-      </div>
-
-      <div class="row">
-        <button id="btnAddSection" class="btn">+ Tambah Section</button>
-      </div>
-
-      <div id="sectionsWrap" class="sections"></div>
-
-      <div class="row">
-        <button id="btnRefreshNo" class="btn">Refresh Nomor (Preview)</button>
-        <button id="btnPreview" class="btn">Refresh Preview</button>
-        <button id="btnSaveDraft" class="btn primary">Simpan Draft (Booking Nomor)</button>
-        <button id="btnFinal" class="btn">Final (Ubah Status)</button>
-        <button id="btnPrint" class="btn">Cetak</button>
-      </div>
-
-      <div id="buatMsg" class="msg"></div>
-
-      <div class="hr"></div>
-      <div class="muted">
-        <b>Catatan:</b> Item nominal 0 tidak disimpan & tidak tercetak.
-      </div>
-    </div>
-
-    <!-- PRINT AREA -->
-    <div id="printArea" class="paper-wrap">
-      <div class="paper" id="paper">
-        <div class="muted">Isi data dulu untuk melihat preview.</div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script type="module" src="./app_v99.js"></script>
 </body>
 </html>
-
