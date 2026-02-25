@@ -1,251 +1,125 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>STSU Digital TMR</title>
-  <link rel="stylesheet" href="./styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STSU Digital</title>
+<style>
+body{font-family:Arial;margin:20px;background:#f2f2f2}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px}
+button{padding:8px 12px;margin:5px;border:none;border-radius:8px;cursor:pointer}
+.primary{background:#2563eb;color:white}
+.success{background:#16a34a;color:white}
+.danger{background:#dc2626;color:white}
+input{padding:8px;margin:5px;width:100%;box-sizing:border-box}
+.hidden{display:none}
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">SU</div>
-      <div class="brandText">
-        <div class="brandTitle">Sistem STSU Digital</div>
-        <div class="brandSub">TMR • Modern tapi tetap resmi</div>
-      </div>
-    </div>
 
-    <div class="topbarRight">
-      <span class="pill" id="authPill">Auth: OFF</span>
-      <button class="iconBtn" id="menuBtn" aria-label="Menu">
-        <span class="hamburger"></span>
-      </button>
-    </div>
-  </header>
+<div class="card" id="loginBox">
+<h3>Login</h3>
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<button class="primary" onclick="login()">Login</button>
+<p id="loginMsg"></p>
+</div>
 
-  <!-- Drawer Menu -->
-  <div class="drawerBackdrop hidden" id="drawerBackdrop"></div>
-  <aside class="drawer hidden" id="drawer">
-    <div class="drawerHeader">
-      <div class="drawerTitle">Menu</div>
-      <button class="ghostBtn" id="drawerClose">Tutup</button>
-    </div>
+<div class="card hidden" id="appBox">
+<h3>Buat STSU</h3>
+<input id="tanggal" type="date">
+<input id="nominal" placeholder="Nominal (angka saja)">
+<button class="success" onclick="saveData()">Simpan</button>
+<button class="danger" onclick="logout()">Logout</button>
+<p id="saveMsg"></p>
+</div>
 
-    <nav class="drawerNav">
-      <button class="navItem" data-route="dashboard">
-        <div class="navMain">Dashboard</div>
-        <div class="navSub">List STSU + grafik</div>
-      </button>
+<div class="card hidden" id="dashBox">
+<h3>Dashboard</h3>
+<div id="list"></div>
+</div>
 
-      <button class="navItem" data-route="create">
-        <div class="navMain">Buat STSU</div>
-        <div class="navSub">Input + Draft/Final + Cetak</div>
-      </button>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-      <button class="navItem" data-route="settings" id="settingsNavItem">
-        <div class="navMain">Settings (Admin)</div>
-        <div class="navSub">Template section</div>
-      </button>
+const firebaseConfig = {
+  apiKey: "AIzaSyDqIE0cumE-7RgK3XE5QIYyQLpzgl1nB8A",
+  authDomain: "stsu-ee385.firebaseapp.com",
+  databaseURL: "https://stsu-ee385-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "stsu-ee385",
+  storageBucket: "stsu-ee385.firebasestorage.app",
+  messagingSenderId: "415025124329",
+  appId: "1:415025124329:web:bbfd49874ddf236d16b178"
+};
 
-      <div class="drawerDivider"></div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-      <button class="navItem danger hidden" id="logoutBtn">
-        <div class="navMain">Logout</div>
-        <div class="navSub">Keluar</div>
-      </button>
-    </nav>
+window.login = async function(){
+  try{
+    await signInWithEmailAndPassword(auth,
+      document.getElementById("email").value,
+      document.getElementById("pass").value
+    );
+  }catch(e){
+    document.getElementById("loginMsg").innerText = e.message;
+  }
+}
 
-    <div class="drawerFooter">
-      <div class="mini">
-        <div><b>User:</b> <span id="meName">-</span></div>
-        <div><b>Role:</b> <span id="meRole">-</span></div>
-      </div>
-    </div>
-  </aside>
+window.logout = async function(){
+  await signOut(auth);
+}
 
-  <main class="container">
-    <!-- LOGIN VIEW -->
-    <section class="card" id="viewLogin">
-      <h2>Login</h2>
-      <p class="muted">Masuk pakai akun Firebase (Email/Password).</p>
+window.saveData = async function(){
+  const tgl = document.getElementById("tanggal").value;
+  const nominal = Number(document.getElementById("nominal").value || 0);
+  if(!tgl || nominal <= 0){
+    document.getElementById("saveMsg").innerText = "Isi tanggal & nominal";
+    return;
+  }
 
-      <div class="grid2">
-        <div>
-          <label>Email</label>
-          <input id="loginEmail" type="email" placeholder="email@tmr.id" autocomplete="username" />
+  await push(ref(db,"stsu"),{
+    uid: auth.currentUser.uid,
+    tanggal: tgl,
+    nominal: nominal,
+    createdAt: Date.now()
+  });
+
+  document.getElementById("saveMsg").innerText = "Tersimpan ✅";
+  loadDashboard();
+}
+
+async function loadDashboard(){
+  const snap = await get(ref(db,"stsu"));
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+  if(snap.exists()){
+    Object.values(snap.val()).forEach(d=>{
+      list.innerHTML += `
+        <div style="padding:8px;border-bottom:1px solid #ccc">
+        ${d.tanggal} - Rp ${d.nominal.toLocaleString("id-ID")}
         </div>
-        <div>
-          <label>Password</label>
-          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
-        </div>
-      </div>
+      `;
+    });
+  }
+}
 
-      <div class="row">
-        <button class="btn" id="loginBtn">Login</button>
-        <button class="btn light" id="resetBtn">Lupa Password</button>
-      </div>
+onAuthStateChanged(auth,(user)=>{
+  if(user){
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("appBox").classList.remove("hidden");
+    document.getElementById("dashBox").classList.remove("hidden");
+    loadDashboard();
+  }else{
+    document.getElementById("loginBox").classList.remove("hidden");
+    document.getElementById("appBox").classList.add("hidden");
+    document.getElementById("dashBox").classList.add("hidden");
+  }
+});
+</script>
 
-      <div class="msg" id="loginMsg"></div>
-
-      <div class="cardSub">
-        <h3>Status</h3>
-        <div class="chips">
-          <span class="chip">Auth: <b id="authStatus">OFF</b></span>
-          <span class="chip">UID: <b id="uidText">-</b></span>
-          <span class="chip">Email: <b id="emailText">-</b></span>
-          <span class="chip">Role: <b id="roleText">-</b></span>
-        </div>
-      </div>
-    </section>
-
-    <!-- DASHBOARD VIEW -->
-    <section class="card hidden" id="viewDashboard">
-      <div class="cardHeader">
-        <div>
-          <h2>Dashboard</h2>
-          <p class="muted">10 STSU terakhir + filter tanggal/bulan + grafik pendapatan.</p>
-        </div>
-      </div>
-
-      <div class="filters">
-        <div>
-          <label>Bulan</label>
-          <input type="month" id="filterMonth" />
-        </div>
-        <div>
-          <label>Jenis</label>
-          <select id="filterJenis">
-            <option value="retribusi">Retribusi</option>
-            <option value="lainnya">Lainnya</option>
-          </select>
-        </div>
-        <div>
-          <label>Cari Tanggal Transaksi</label>
-          <input type="date" id="searchDate" />
-        </div>
-        <div class="filterActions">
-          <button class="btn" id="loadDashboardBtn">Muat</button>
-          <button class="btn light" id="clearSearchBtn">Reset</button>
-        </div>
-      </div>
-
-      <div class="dashGrid">
-        <div class="cardInner">
-          <h3>Grafik</h3>
-          <canvas id="chartCanvas" height="160"></canvas>
-        </div>
-
-        <div class="cardInner">
-          <h3>10 STSU Terakhir</h3>
-          <div class="muted small" id="dashInfo"></div>
-          <div class="list" id="stsuList"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CREATE VIEW -->
-    <section class="card hidden" id="viewCreate">
-      <div class="cardHeader">
-        <div>
-          <h2>Buat STSU</h2>
-          <p class="muted">
-            Nomor STSU <b>tidak akan naik</b> kalau cuma pilih tanggal / refresh.
-            Nomor baru naik saat <b>Simpan Draft</b> (atau Final).
-          </p>
-        </div>
-        <span class="badge" id="statusBadge">DRAFT</span>
-      </div>
-
-      <div class="formGrid">
-        <div>
-          <label>Jenis</label>
-          <select id="jenisSelect">
-            <option value="retribusi">Retribusi</option>
-            <option value="lainnya">Lainnya</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Tanggal Transaksi (untuk nomor)</label>
-          <input type="date" id="tglTransaksi" />
-        </div>
-
-        <div>
-          <label>Tanggal STSU (TTD / boleh belakangan)</label>
-          <input type="date" id="tglStsu" />
-        </div>
-
-        <div>
-          <label>Nomor STSU (preview)</label>
-          <input type="text" id="noPreview" readonly />
-        </div>
-      </div>
-
-      <div class="row wrap">
-        <button class="btn light" id="refreshNoBtn">Refresh Nomor (tanpa naik)</button>
-        <button class="btn" id="saveDraftBtn">Simpan Draft (nomor naik)</button>
-        <button class="btn ok" id="saveFinalBtn">Simpan Final</button>
-        <button class="btn" id="printBtn">Cetak A4</button>
-        <button class="btn danger" id="resetFormBtn">Reset Form</button>
-      </div>
-
-      <div class="msg" id="createMsg"></div>
-
-      <div class="cardSub">
-        <div class="rowBetween">
-          <div>
-            <h3>Section</h3>
-            <p class="muted small">Nominal 0 tidak akan tampil / tersimpan / tercetak.</p>
-          </div>
-          <button class="btn light" id="addSectionBtn">+ Section Baru</button>
-        </div>
-
-        <div id="sectionsWrap"></div>
-      </div>
-
-      <!-- PRINT AREA (A4 only) -->
-      <div class="printWrap">
-        <div class="paper" id="printArea">
-          <!-- filled by JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- SETTINGS VIEW (ADMIN) -->
-    <section class="card hidden" id="viewSettings">
-      <h2>Settings (Admin)</h2>
-      <p class="muted">Atur template section (enable/disable, rename, urutan). Tersimpan di RTDB.</p>
-
-      <div class="filters">
-        <div>
-          <label>Template</label>
-          <select id="tplSelect">
-            <option value="retribusi">Retribusi</option>
-            <option value="lainnya">Lainnya</option>
-          </select>
-        </div>
-        <div class="filterActions">
-          <button class="btn" id="loadTplBtn">Muat</button>
-          <button class="btn ok" id="saveTplBtn">Simpan</button>
-        </div>
-      </div>
-
-      <div class="cardInner">
-        <h3>Editor Template (JSON)</h3>
-        <textarea id="tplJson" rows="16" spellcheck="false"></textarea>
-        <div class="muted small">
-          Tips: section baru taruh di atas E-ticketing sesuai kebutuhan (ubah urutan array).
-        </div>
-      </div>
-
-      <div class="msg" id="settingsMsg"></div>
-    </section>
-  </main>
-
-  <!-- libs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <script type="module" src="./app.js"></script>
 </body>
 </html>
