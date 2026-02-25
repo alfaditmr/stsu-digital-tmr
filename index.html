@@ -2,830 +2,254 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>STSU Digital TMR</title>
-  <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e5e7eb;
-      --primary:#2563eb;
-      --danger:#ef4444;
-      --ok:#16a34a;
-      --shadow:0 10px 30px rgba(2,6,23,.08);
-      --radius:16px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:var(--sans); background:var(--bg); color:var(--text);}
-    header{
-      position:sticky; top:0; z-index:10;
-      background:rgba(246,247,251,.85); backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--line);
-    }
-    .wrap{max-width:1024px; margin:0 auto; padding:14px 16px;}
-    .topbar{display:flex; gap:12px; align-items:center; justify-content:space-between;}
-    .brand{display:flex; gap:10px; align-items:center;}
-    .logo{
-      width:38px; height:38px; border-radius:12px;
-      display:grid; place-items:center;
-      background:var(--primary); color:white; font-weight:800;
-      box-shadow: var(--shadow);
-    }
-    .brand h1{font-size:16px; margin:0; line-height:1.1}
-    .brand p{margin:0; font-size:12px; color:var(--muted)}
-    .right{display:flex; gap:10px; align-items:center}
-    .pill{
-      border:1px solid var(--line);
-      background:white;
-      padding:8px 10px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
-      display:flex; gap:8px; align-items:center;
-    }
-    .btn{
-      border:1px solid var(--line);
-      background:white;
-      padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:700;
-    }
-    .btn.primary{background:var(--primary); color:white; border-color:transparent;}
-    .btn.ok{background:var(--ok); color:white; border-color:transparent;}
-    .btn.danger{background:var(--danger); color:white; border-color:transparent;}
-    .btn:disabled{opacity:.5; cursor:not-allowed}
-    main .wrap{padding-top:18px; padding-bottom:40px;}
-    .grid{display:grid; gap:14px;}
-    @media(min-width: 920px){
-      .grid{grid-template-columns: 1fr 1fr;}
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      padding:16px;
-    }
-    .card h2{margin:0 0 6px; font-size:18px}
-    .card p{margin:0 0 14px; color:var(--muted); font-size:13px}
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
-    input, select{
-      width:100%;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      outline:none;
-      font-size:14px;
-      background:white;
-    }
-    input:focus, select:focus{border-color:#93c5fd; box-shadow:0 0 0 4px rgba(59,130,246,.12);}
-    .field{flex:1; min-width:180px}
-    .mono{font-family:var(--mono)}
-    .muted{color:var(--muted)}
-    .hr{height:1px; background:var(--line); margin:12px 0}
-    .list{display:flex; flex-direction:column; gap:10px}
-    .item{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:14px;
-      padding:12px;
-      display:flex;
-      gap:12px;
-      justify-content:space-between;
-      align-items:flex-start;
-    }
-    .item .left{min-width:0}
-    .item .title{font-weight:900}
-    .item .meta{font-size:12px; color:var(--muted); margin-top:4px}
-    .badge{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#f8fafc;
-      color:#334155;
-      font-weight:800;
-    }
-    .badge.final{background:#ecfdf5; border-color:#bbf7d0; color:#065f46}
-    .badge.draft{background:#fff7ed; border-color:#fed7aa; color:#9a3412}
-    .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-    .small{padding:8px 10px; border-radius:12px; font-weight:800; font-size:12px}
-    .toast{
-      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
-      background:#0f172a; color:white;
-      padding:10px 14px; border-radius:999px;
-      box-shadow: var(--shadow);
-      font-size:13px;
-      opacity:0; pointer-events:none;
-      transition: opacity .18s ease;
-    }
-    .toast.show{opacity:1}
-    .hidden{display:none !important}
-
-    /* PRINT: hanya cetak area STSU */
-    @media print{
-      header, .no-print {display:none !important;}
-      body{background:white}
-      .wrap{max-width:none; padding:0}
-      .card{box-shadow:none; border:none; padding:0}
-      #printArea{display:block !important;}
-      #printArea .paper{
-        border:none !important;
-        box-shadow:none !important;
-        margin:0 !important;
-        padding:0 !important;
-      }
-    }
-
-    /* Tampilan STSU cetak */
-    .paper{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:26px 28px;
-      margin-top:14px;
-    }
-    .paper h3{
-      text-align:center;
-      margin:0;
-      font-size:14px;
-      letter-spacing:.4px;
-    }
-    .paper .no{
-      text-align:center;
-      margin-top:6px;
-      font-size:12px;
-      color:#334155;
-    }
-    .stsu-row{
-      display:grid;
-      grid-template-columns: 1fr 160px;
-      gap:10px;
-      align-items:center;
-      padding:6px 0;
-      border-bottom:1px solid #e5e7eb;
-      font-size:12px;
-    }
-    .stsu-row .amt{
-      text-align:right;
-      font-variant-numeric: tabular-nums;
-    }
-    .stsu-total{
-      margin-top:10px;
-      padding-top:10px;
-      border-top:2px solid #111827;
-      display:flex;
-      justify-content:space-between;
-      font-size:12px;
-      font-weight:900;
-    }
-    .stsu-terbilang{margin-top:6px; font-size:11px;}
-    .stsu-penutup{
-      margin-top:12px;
-      font-size:11px;
-      line-height:1.35;
-    }
-    .ttd{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      font-size:11px;
-    }
-    .ttd .name{
-      margin-top:34px;
-      font-weight:900;
-      text-decoration:underline;
-      text-underline-offset:3px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistem STSU Digital TMR</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
-
 <body>
-<header>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">SU</div>
-        <div>
-          <h1>Sistem STSU Digital</h1>
-          <p>TMR • Modern tapi tetap resmi</p>
-        </div>
-      </div>
-      <div class="right">
-        <div class="pill"><span class="muted">Auth:</span> <b id="authState">OFF</b></div>
-        <button class="btn" id="btnLogout" style="display:none;">Logout</button>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">SU</div>
+      <div class="brand-text">
+        <div class="brand-title">Sistem STSU Digital</div>
+        <div class="brand-sub">TMR · Modern tapi tetap resmi</div>
       </div>
     </div>
-  </div>
-</header>
 
-<main>
-  <div class="wrap">
+    <div class="topbar-right">
+      <span class="pill" id="authPill">Auth: OFF</span>
+      <button class="iconbtn" id="menuBtn" title="Menu">☰</button>
+    </div>
+  </header>
 
+  <!-- Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div class="drawer-title">Menu</div>
+      <button class="btn" id="drawerClose">Tutup</button>
+    </div>
+
+    <div class="drawer-card">
+      <div class="drawer-row">
+        <div>
+          <div class="drawer-item-title">Dashboard</div>
+          <div class="muted">10 STSU terakhir + cari tanggal</div>
+        </div>
+        <button class="btn" data-nav="dashboard">Buka</button>
+      </div>
+      <div class="drawer-row">
+        <div>
+          <div class="drawer-item-title">Buat STSU</div>
+          <div class="muted">Draft/Final + preview dokumen</div>
+        </div>
+        <button class="btn" data-nav="buat">Buka</button>
+      </div>
+    </div>
+
+    <div class="drawer-card">
+      <div class="drawer-item-title">Akun</div>
+      <div class="muted" id="userInfo">Belum login</div>
+      <div class="drawer-actions">
+        <button class="btn danger" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="container">
     <!-- LOGIN -->
-    <section class="card" id="cardLogin">
-      <h2>Login</h2>
-      <p>Masuk pakai akun Firebase (Email/Password).</p>
-      <div class="row">
+    <section class="card" id="loginCard">
+      <div class="card-head">
+        <div>
+          <h2>Login</h2>
+          <p class="muted">Masuk pakai akun Firebase (Email/Password).</p>
+        </div>
+        <span class="badge" id="loginBadge">Login ❌</span>
+      </div>
+
+      <div class="grid2">
         <div class="field">
           <label>Email</label>
-          <input id="email" type="email" placeholder="email@domain.com" autocomplete="username">
+          <input id="email" type="email" placeholder="nama@domain.com" autocomplete="username" />
         </div>
         <div class="field">
           <label>Password</label>
-          <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password">
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
         </div>
       </div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn primary" id="btnLogin">Login</button>
-        <button class="btn" id="btnReset">Lupa Password</button>
-        <div class="pill" id="loginMsg" style="display:none;"></div>
+
+      <div class="row">
+        <button class="btn primary" id="loginBtn">Login</button>
+        <button class="btn" id="resetBtn">Lupa Password</button>
+        <span class="muted" id="loginMsg"></span>
       </div>
-      <div class="hr"></div>
-      <p class="muted">Catatan: kalau login gagal di GitHub Pages, cek Firebase Console → Authentication → Settings → Authorized domains dan tambahkan <b>alfaditmr.github.io</b>.</p>
     </section>
 
-    <div class="grid">
-      <!-- BUAT STSU -->
-      <section class="card" id="cardCreate" style="display:none;">
-        <h2>Buat STSU (Tahap 2)</h2>
-        <p>Nomor STSU hanya naik saat simpan Draft/Final. Nominal 0 tidak disimpan.</p>
+    <!-- DASHBOARD -->
+    <section class="card" id="dashboardCard">
+      <div class="card-head">
+        <div>
+          <h2>Dashboard</h2>
+          <p class="muted">Menampilkan 10 STSU terakhir. Cari berdasarkan tanggal transaksi.</p>
+        </div>
+        <span class="badge ok" id="dashBadge">READY</span>
+      </div>
 
-        <div class="row">
-          <div class="field">
-            <label>Tanggal transaksi</label>
-            <input id="tgl" type="date">
-          </div>
-          <div class="field">
-            <label>Nominal (auto titik ribuan)</label>
-            <input id="nominal" inputmode="numeric" placeholder="0">
-          </div>
+      <div class="grid3">
+        <div class="field">
+          <label>Cari tanggal (YYYY-MM-DD)</label>
+          <input id="searchDate" type="date" />
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn primary" id="searchBtn">Cari</button>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn" id="last10Btn">10 Terakhir</button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="summary-item">
+          <div class="muted">Jumlah</div>
+          <div class="big" id="sumCount">0</div>
+        </div>
+        <div class="summary-item">
+          <div class="muted">Total</div>
+          <div class="big" id="sumTotal">Rp 0</div>
+        </div>
+      </div>
+
+      <div class="list" id="stsuList"></div>
+      <div class="muted" id="dashMsg"></div>
+    </section>
+
+    <!-- BUAT STSU -->
+    <section class="card" id="buatCard">
+      <div class="card-head">
+        <div>
+          <h2>Buat STSU</h2>
+          <p class="muted">
+            Nomor STSU hanya naik saat <b>Simpan Draft</b> / <b>Simpan Final</b>.
+            Jika cuma ganti tanggal / refresh halaman, <b>nomor tidak berubah</b>.
+          </p>
+        </div>
+        <span class="badge" id="buatBadge">DRAFT</span>
+      </div>
+
+      <div class="grid3">
+        <div class="field">
+          <label>Tanggal transaksi</label>
+          <input id="txDate" type="date" />
         </div>
 
-        <div class="row" style="margin-top:10px">
-          <button class="btn" id="btnDraft">Simpan Draft</button>
-          <button class="btn ok" id="btnFinal">Simpan Final</button>
-          <button class="btn" id="btnPreview">Preview + Print</button>
+        <div class="field">
+          <label>Nominal (auto titik ribuan)</label>
+          <input id="singleNominal" type="text" inputmode="numeric" placeholder="0" />
+          <div class="hint">Boleh kosong. Ini hanya contoh input cepat (kalau mau mode sederhana).</div>
         </div>
 
-        <div class="hr"></div>
-        <div class="row">
-          <div class="pill">
-            <span class="muted">UID</span>
-            <b class="mono" id="uidBox">-</b>
-          </div>
-          <div class="pill">
-            <span class="muted">Role</span>
-            <b id="roleBox">user</b>
-          </div>
-          <div class="pill">
-            <span class="muted">No STSU (akan keluar setelah simpan)</span>
-            <b class="mono" id="noBox">-</b>
-          </div>
+        <div class="field">
+          <label>No STSU (keluar setelah simpan)</label>
+          <input id="stsuNo" type="text" disabled />
+          <div class="hint">Tidak akan “loncat” kalau belum simpan.</div>
         </div>
+      </div>
 
-        <!-- PRINT AREA -->
-        <div id="printArea" class="no-print" style="display:none;">
-          <div class="paper" id="paperInner"></div>
-        </div>
-      </section>
+      <div class="row">
+        <button class="btn" id="newDraftBtn">Buat Draft Baru</button>
+        <button class="btn primary" id="saveDraftBtn">Simpan Draft</button>
+        <button class="btn success" id="saveFinalBtn">Simpan Final</button>
+        <button class="btn" id="printBtn">Preview Dokumen + Print</button>
+        <span class="muted" id="buatMsg"></span>
+      </div>
 
-      <!-- DASHBOARD -->
-      <section class="card" id="cardDash" style="display:none;">
-        <h2>Dashboard</h2>
-        <p>Default: 10 STSU terakhir. Cari berdasarkan tanggal.</p>
+      <hr class="sep" />
 
-        <div class="row">
-          <div class="field">
-            <label>Cari tanggal (YYYY-MM-DD)</label>
-            <input id="searchDate" type="date">
-          </div>
-          <div class="row" style="margin-top:18px">
-            <button class="btn primary" id="btnSearch">Cari</button>
-            <button class="btn" id="btnLast10">10 Terakhir</button>
-          </div>
-        </div>
+      <!-- Dokumen yang diprint (HANYA ini yang masuk preview print) -->
+      <div id="docWrap">
+        <div class="doc" id="doc">
+          <div class="doc-title">SURAT TANDA SETOR UANG</div>
+          <div class="doc-no">No: <span id="docNo">-</span></div>
 
-        <div class="hr"></div>
+          <div class="doc-body">
+            <div class="doc-section">
+              <div class="sec-title">Pemakaian Fasilitas</div>
+              <div class="sec-rows" id="secFasilitas"></div>
+              <div class="sec-sub">
+                <span>Subtotal Pemakaian Fasilitas</span>
+                <span class="dots"></span>
+                <span id="subFasilitas">Rp 0</span>
+              </div>
+            </div>
 
-        <div class="row">
-          <div class="pill"><span class="muted">Jumlah</span> <b id="countBox">0</b></div>
-          <div class="pill"><span class="muted">Total</span> <b id="sumBox">Rp 0</b></div>
-        </div>
+            <div class="doc-section">
+              <div class="sec-title">E-ticketing</div>
+              <div class="sec-rows" id="secEticket"></div>
+              <div class="sec-sub">
+                <span>Subtotal E-ticketing</span>
+                <span class="dots"></span>
+                <span id="subEticket">Rp 0</span>
+              </div>
+            </div>
 
-        <div class="hr"></div>
-        <div class="list" id="list"></div>
-      </section>
-    </div>
+            <div class="doc-total">
+              <div class="total-title">JUMLAH TOTAL</div>
+              <div class="total-val" id="grandTotal">Rp 0</div>
+            </div>
 
-  </div>
-</main>
+            <div class="doc-terbilang">
+              <div class="muted">Terbilang :</div>
+              <div id="terbilang">nol rupiah</div>
+            </div>
 
-<div class="toast" id="toast">OK</div>
+            <div class="doc-para" id="docPara"></div>
 
-<script type="module">
-  // ===== Firebase CDN (Modular) =====
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import {
-    getAuth, onAuthStateChanged,
-    signInWithEmailAndPassword,
-    sendPasswordResetEmail,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-  import {
-    getDatabase, ref, get, set, update, remove,
-    query, orderByChild, limitToLast,
-    onValue,
-    runTransaction
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-
-  // ===== CONFIG (punyamu) =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyDqIE0cumE-7RgK3XE5QIYyQLpzgl1nB8A",
-    authDomain: "stsu-ee385.firebaseapp.com",
-    databaseURL: "https://stsu-ee385-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "stsu-ee385",
-    storageBucket: "stsu-ee385.firebasestorage.app",
-    messagingSenderId: "415025124329",
-    appId: "1:415025124329:web:bbfd49874ddf236d16b178"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
-
-  // ===== DOM =====
-  const el = (id)=>document.getElementById(id);
-  const toast = (msg)=>{
-    el("toast").textContent = msg;
-    el("toast").classList.add("show");
-    setTimeout(()=>el("toast").classList.remove("show"), 1600);
-  };
-
-  const authState = el("authState");
-  const cardLogin  = el("cardLogin");
-  const cardCreate = el("cardCreate");
-  const cardDash   = el("cardDash");
-  const btnLogout  = el("btnLogout");
-
-  const email = el("email");
-  const pass  = el("pass");
-  const loginMsg = el("loginMsg");
-
-  const tgl = el("tgl");
-  const nominal = el("nominal");
-  const btnLogin = el("btnLogin");
-  const btnReset = el("btnReset");
-  const btnDraft = el("btnDraft");
-  const btnFinal = el("btnFinal");
-  const btnPreview = el("btnPreview");
-  const uidBox = el("uidBox");
-  const roleBox = el("roleBox");
-  const noBox = el("noBox");
-
-  const btnSearch = el("btnSearch");
-  const btnLast10 = el("btnLast10");
-  const searchDate = el("searchDate");
-  const list = el("list");
-  const countBox = el("countBox");
-  const sumBox = el("sumBox");
-
-  const printArea = el("printArea");
-  const paperInner = el("paperInner");
-
-  // ===== STATE =====
-  let CURRENT_UID = null;
-  let CURRENT_ROLE = "user";
-  let DASH_UNSUB = null;
-  let LAST_RENDER = []; // cache list for edit actions
-
-  // ===== HELPERS =====
-  function todayISO(){
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
-  function idDateParts(iso){
-    // iso: YYYY-MM-DD
-    const [y,m,d] = iso.split("-");
-    return { y, m, d, ddmm: `${d}${m}` };
-  }
-
-  function rupiah(n){
-    const x = Number(n||0);
-    return "Rp " + x.toLocaleString("id-ID");
-  }
-
-  function onlyDigits(str){
-    return (str||"").replace(/[^\d]/g,"");
-  }
-
-  function formatRibuanFromDigits(digits){
-    if(!digits) return "";
-    // pakai locale id-ID
-    return Number(digits).toLocaleString("id-ID");
-  }
-
-  function nominalToNumber(){
-    const digits = onlyDigits(nominal.value);
-    return Number(digits||0);
-  }
-
-  function setBusy(isBusy){
-    [btnDraft, btnFinal, btnPreview, btnSearch, btnLast10].forEach(b=>b.disabled = isBusy);
-  }
-
-  // ===== INPUT: auto titik ribuan saat ngetik =====
-  nominal.addEventListener("input", ()=>{
-    const digits = onlyDigits(nominal.value);
-    nominal.value = formatRibuanFromDigits(digits);
-  });
-
-  // Set default date
-  tgl.value = todayISO();
-
-  // ===== AUTH =====
-  btnLogin.addEventListener("click", async ()=>{
-    loginMsg.style.display="none";
-    try{
-      await signInWithEmailAndPassword(auth, email.value.trim(), pass.value);
-      toast("Login berhasil ✅");
-    }catch(err){
-      loginMsg.style.display="inline-flex";
-      loginMsg.textContent = "Login gagal: " + (err?.message || err);
-    }
-  });
-
-  btnReset.addEventListener("click", async ()=>{
-    const em = email.value.trim();
-    if(!em) return toast("Isi email dulu.");
-    try{
-      await sendPasswordResetEmail(auth, em);
-      toast("Link reset terkirim ✅");
-    }catch(err){
-      toast("Gagal reset: " + (err?.message || err));
-    }
-  });
-
-  btnLogout.addEventListener("click", async ()=>{
-    await signOut(auth);
-    toast("Logout");
-  });
-
-  async function loadRole(uid){
-    // roles disimpan di /users/{uid}/role
-    const snap = await get(ref(db, `users/${uid}/role`));
-    return snap.exists() ? String(snap.val()) : "user";
-  }
-
-  function showLoggedIn(uid, role){
-    authState.textContent = "ON";
-    btnLogout.style.display = "inline-block";
-    cardLogin.style.display = "none";
-    cardCreate.style.display = "block";
-    cardDash.style.display = "block";
-    uidBox.textContent = uid;
-    roleBox.textContent = role;
-    noBox.textContent = "-";
-  }
-
-  function showLoggedOut(){
-    authState.textContent = "OFF";
-    btnLogout.style.display = "none";
-    cardLogin.style.display = "block";
-    cardCreate.style.display = "none";
-    cardDash.style.display = "none";
-    uidBox.textContent = "-";
-    roleBox.textContent = "user";
-    noBox.textContent = "-";
-    list.innerHTML = "";
-    countBox.textContent="0";
-    sumBox.textContent="Rp 0";
-    if(DASH_UNSUB){ DASH_UNSUB(); DASH_UNSUB=null; }
-  }
-
-  onAuthStateChanged(auth, async (user)=>{
-    if(!user){
-      CURRENT_UID = null;
-      CURRENT_ROLE = "user";
-      showLoggedOut();
-      return;
-    }
-    CURRENT_UID = user.uid;
-    CURRENT_ROLE = await loadRole(user.uid);
-    showLoggedIn(user.uid, CURRENT_ROLE);
-    // auto load last10
-    loadLast10();
-  });
-
-  // ===== CORE: nomor STSU naik HANYA saat simpan =====
-  async function nextStsuNumberByDate(iso){
-    const { y, m, d, ddmm } = idDateParts(iso);
-    const counterRef = ref(db, `counters/${y}/${ddmm}`);
-    const res = await runTransaction(counterRef, (cur)=>{
-      if(cur === null) return 1;
-      return Number(cur||0) + 1;
-    });
-    const seq = res.snapshot.val();
-    // format: {seq}/{dd}/{mm}/SU/{yyyy}
-    const no = `${seq}/${d}/${m}/SU/${y}`;
-    return { seq, no, y, m, d, ddmm };
-  }
-
-  function buildTerbilangSimple(n){
-    // terbilang sederhana (cukup stabil buat rupiah) - sudah cukup untuk dokumen internal
-    const angka = ["","satu","dua","tiga","empat","lima","enam","tujuh","delapan","sembilan","sepuluh","sebelas"];
-    n = Math.floor(Number(n||0));
-    if(n===0) return "nol rupiah";
-    function t(x){
-      if(x < 12) return angka[x];
-      if(x < 20) return t(x-10) + " belas";
-      if(x < 100) return t(Math.floor(x/10)) + " puluh" + (x%10? " " + t(x%10):"");
-      if(x < 200) return "seratus" + (x-100? " " + t(x-100):"");
-      if(x < 1000) return t(Math.floor(x/100)) + " ratus" + (x%100? " " + t(x%100):"");
-      if(x < 2000) return "seribu" + (x-1000? " " + t(x-1000):"");
-      if(x < 1000000) return t(Math.floor(x/1000)) + " ribu" + (x%1000? " " + t(x%1000):"");
-      if(x < 1000000000) return t(Math.floor(x/1000000)) + " juta" + (x%1000000? " " + t(x%1000000):"");
-      if(x < 1000000000000) return t(Math.floor(x/1000000000)) + " miliar" + (x%1000000000? " " + t(x%1000000000):"");
-      return t(Math.floor(x/1000000000000)) + " triliun" + (x%1000000000000? " " + t(x%1000000000000):"");
-    }
-    return (t(n) + " rupiah").replace(/\s+/g," ").trim();
-  }
-
-  function makePrintHtml({no, isoDate, total, status}){
-    const d = new Date(isoDate + "T00:00:00");
-    const hari = d.toLocaleDateString("id-ID",{ weekday:"long" });
-    const tglID = d.toLocaleDateString("id-ID",{ day:"2-digit", month:"long", year:"numeric" });
-
-    const terbilang = buildTerbilangSimple(total);
-
-    // Penutup hanya untuk “pendapatan retribusi” di versi besar kamu.
-    // Di tahap 2 ini kita buat penutup tetap ada (biar rapi), nanti bisa kamu bedakan by template.
-    const penutup = `Disetor uang kebendahara penerimaan hasil retribusi layanan masuk tempat rekreasi dan pemakaian fasilitas TMR pada hari ${hari} tanggal ${tglID} dengan STSU No. ${no} dengan uang sebesar ${rupiah(total)}.`;
-
-    return `
-      <h3>SURAT TANDA SETOR UANG</h3>
-      <div class="no">No: <b>${no}</b></div>
-
-      <div style="margin-top:14px">
-        <div class="stsu-row">
-          <div><b>Pendapatan</b> <span style="color:#64748b">(${status})</span></div>
-          <div class="amt"><b>${rupiah(total)}</b></div>
-        </div>
-
-        <div class="stsu-total">
-          <div>JUMLAH TOTAL</div>
-          <div>${rupiah(total)}</div>
-        </div>
-
-        <div class="stsu-terbilang"><b>Terbilang :</b> ${terbilang}</div>
-
-        <div class="stsu-penutup">${penutup}</div>
-
-        <div class="ttd">
-          <div>
-            Kepala Seksi Pelayanan & Informasi
-            <div class="name">NAMA KEPALA SEKSI</div>
-          </div>
-          <div style="text-align:right">
-            Jakarta, ...............
-            <div style="margin-top:6px">Bendahara Penerimaan</div>
-            <div class="name">NAMA BENDAHARA</div>
+            <div class="doc-sign">
+              <div class="sign-col">
+                <div class="muted">Kepala Seksi Pelayanan & Informasi</div>
+                <div class="sign-line">NAMA KEPALA SEKSI</div>
+              </div>
+              <div class="sign-col right">
+                <div class="muted">Jakarta, <span id="signDate">............</span></div>
+                <div class="muted" style="margin-top:22px;">Bendahara Penerimaan</div>
+                <div class="sign-line">NAMA BENDAHARA</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    `;
-  }
 
-  async function saveStsu(status){
-    if(!CURRENT_UID) return toast("Belum login.");
-    const iso = tgl.value;
-    if(!iso) return toast("Pilih tanggal.");
-    const amt = nominalToNumber();
+      <hr class="sep" />
 
-    // IGNORE 0: tidak simpan
-    if(!amt || amt <= 0){
-      toast("Nominal tidak boleh 0.");
-      return;
-    }
-
-    setBusy(true);
-    try{
-      // nomor keluar saat simpan draft/final
-      const { no } = await nextStsuNumberByDate(iso);
-
-      const stsuId = crypto.randomUUID ? crypto.randomUUID() : ("id_" + Date.now());
-      const now = Date.now();
-
-      const payload = {
-        id: stsuId,
-        uid: CURRENT_UID,
-        no,
-        tgl: iso,
-        total: amt,
-        status, // draft | final
-        createdAt: now,
-        updatedAt: now
-      };
-
-      // atomic multi-location update
-      const updates = {};
-      updates[`stsu/${CURRENT_UID}/${stsuId}`] = payload;
-      updates[`stsu_index/${CURRENT_UID}/${stsuId}`] = {
-        id: stsuId,
-        no,
-        tgl: iso,
-        total: amt,
-        status,
-        createdAt: now,
-        updatedAt: now
-      };
-
-      await update(ref(db), updates);
-
-      noBox.textContent = no;
-      toast(status === "final" ? "Final tersimpan ✅" : "Draft tersimpan ✅");
-
-      // refresh dashboard view
-      loadLast10();
-    }catch(err){
-      console.error(err);
-      toast("Gagal simpan: " + (err?.message || err));
-    }finally{
-      setBusy(false);
-    }
-  }
-
-  btnDraft.addEventListener("click", ()=>saveStsu("draft"));
-  btnFinal.addEventListener("click", ()=>saveStsu("final"));
-
-  btnPreview.addEventListener("click", ()=>{
-    const iso = tgl.value;
-    const amt = nominalToNumber();
-    if(!iso) return toast("Pilih tanggal.");
-    if(!amt || amt<=0) return toast("Nominal tidak boleh 0.");
-    // preview tanpa menaikkan nomor (pakai dummy)
-    const { y,m,d } = idDateParts(iso);
-    const dummyNo = `X/${d}/${m}/SU/${y}`;
-    paperInner.innerHTML = makePrintHtml({ no: dummyNo, isoDate: iso, total: amt, status: "preview" });
-    printArea.style.display = "block";
-    // print langsung
-    window.print();
-    // setelah print, sembunyikan lagi
-    setTimeout(()=>{ printArea.style.display="none"; }, 800);
-  });
-
-  // ===== DASHBOARD LOADERS =====
-  function renderList(items){
-    LAST_RENDER = items.slice();
-    list.innerHTML = "";
-    if(items.length === 0){
-      list.innerHTML = `<div class="muted">Belum ada data.</div>`;
-      countBox.textContent = "0";
-      sumBox.textContent = "Rp 0";
-      return;
-    }
-
-    let sum = 0;
-    for(const it of items) sum += Number(it.total||0);
-
-    countBox.textContent = String(items.length);
-    sumBox.textContent = rupiah(sum);
-
-    items
-      .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0)) // latest first
-      .forEach((it)=>{
-        const badge = it.status === "final" ? `<span class="badge final">FINAL</span>` : `<span class="badge draft">DRAFT</span>`;
-        const canAdmin = (CURRENT_ROLE === "admin");
-
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <div class="left">
-            <div class="title">${it.no || "(no belum ada)"}</div>
-            <div class="meta">
-              <span class="mono">${it.tgl || "-"}</span> • <b>${rupiah(it.total||0)}</b> • ${badge}
+      <!-- Input item (contoh sederhana) -->
+      <div class="grid2">
+        <div class="card inner">
+          <div class="inner-head">
+            <div>
+              <div class="inner-title">Pemakaian Fasilitas</div>
+              <div class="muted">Isi nominal. Nominal 0 / kosong tidak disimpan & tidak dicetak.</div>
             </div>
           </div>
-          <div class="actions no-print">
-            <button class="btn small" data-act="print" data-id="${it.id}">Print</button>
-            ${canAdmin ? `<button class="btn small" data-act="edit" data-id="${it.id}">Edit</button>` : ``}
-            ${canAdmin ? `<button class="btn small danger" data-act="del" data-id="${it.id}">Hapus</button>` : ``}
+          <div class="rows" id="inputFasilitas"></div>
+          <button class="btn small" id="addFasilitas">+ Tambah baris</button>
+        </div>
+
+        <div class="card inner">
+          <div class="inner-head">
+            <div>
+              <div class="inner-title">E-ticketing</div>
+              <div class="muted">Isi nominal. Nominal 0 / kosong tidak disimpan & tidak dicetak.</div>
+            </div>
           </div>
-        `;
-        list.appendChild(div);
-      });
-  }
+          <div class="rows" id="inputEticket"></div>
+          <button class="btn small" id="addEticket">+ Tambah baris</button>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  function attachListActions(){
-    list.addEventListener("click", async (e)=>{
-      const btn = e.target.closest("button");
-      if(!btn) return;
-      const id = btn.getAttribute("data-id");
-      const act = btn.getAttribute("data-act");
-      const it = LAST_RENDER.find(x=>x.id===id);
-      if(!it) return;
-
-      if(act==="print"){
-        // ambil data lengkap kalau perlu, tapi ringkas sudah cukup
-        paperInner.innerHTML = makePrintHtml({
-          no: it.no,
-          isoDate: it.tgl,
-          total: it.total,
-          status: it.status
-        });
-        printArea.style.display = "block";
-        window.print();
-        setTimeout(()=>{ printArea.style.display="none"; }, 800);
-      }
-
-      if(act==="edit"){
-        if(CURRENT_ROLE !== "admin") return toast("Hanya admin.");
-        const newVal = prompt("Ubah nominal (angka saja):", String(it.total||0));
-        if(newVal === null) return;
-        const num = Number(onlyDigits(newVal));
-        if(!num || num<=0) return toast("Nominal harus > 0");
-
-        const now = Date.now();
-        const up = {};
-        up[`stsu/${CURRENT_UID}/${id}/total`] = num;
-        up[`stsu/${CURRENT_UID}/${id}/updatedAt`] = now;
-        up[`stsu_index/${CURRENT_UID}/${id}/total`] = num;
-        up[`stsu_index/${CURRENT_UID}/${id}/updatedAt`] = now;
-        await update(ref(db), up);
-        toast("Nominal diupdate ✅");
-      }
-
-      if(act==="del"){
-        if(CURRENT_ROLE !== "admin") return toast("Hanya admin.");
-        if(!confirm("Hapus STSU ini?")) return;
-        await remove(ref(db, `stsu/${CURRENT_UID}/${id}`));
-        await remove(ref(db, `stsu_index/${CURRENT_UID}/${id}`));
-        toast("Terhapus ✅");
-      }
-    });
-  }
-  attachListActions();
-
-  function listenIndex(q){
-    if(DASH_UNSUB){ DASH_UNSUB(); DASH_UNSUB=null; }
-    // onValue returns unsubscribe
-    DASH_UNSUB = onValue(q, (snap)=>{
-      const items = [];
-      snap.forEach(ch=>{
-        const v = ch.val();
-        if(v && v.total && Number(v.total)>0){ // IGNORE 0
-          items.push(v);
-        }
-      });
-      // RTDB limitToLast akan memberi ascending, kita render latest first di renderList()
-      renderList(items);
-    }, (err)=>{
-      console.error(err);
-      toast("Gagal load dashboard: " + (err?.message || err));
-    });
-  }
-
-  function loadLast10(){
-    if(!CURRENT_UID) return;
-    const q = query(ref(db, `stsu_index/${CURRENT_UID}`), orderByChild("createdAt"), limitToLast(10));
-    listenIndex(q);
-  }
-
-  function loadByDate(iso){
-    // RTDB query by child exact: kita butuh index "tgl" di setiap item stsu_index
-    // Cara paling aman: ambil last 200 lalu filter client. Tapi kamu minta ringan.
-    // Jadi kita lakukan: ambil 200 terakhir, filter di client = hasil biasanya cukup.
-    if(!CURRENT_UID) return;
-    const q = query(ref(db, `stsu_index/${CURRENT_UID}`), orderByChild("createdAt"), limitToLast(200));
-    if(DASH_UNSUB){ DASH_UNSUB(); DASH_UNSUB=null; }
-    DASH_UNSUB = onValue(q, (snap)=>{
-      const items = [];
-      snap.forEach(ch=>{
-        const v = ch.val();
-        if(!v) return;
-        if(v.tgl === iso && v.total && Number(v.total)>0) items.push(v);
-      });
-      renderList(items);
-    });
-  }
-
-  btnLast10.addEventListener("click", ()=>loadLast10());
-  btnSearch.addEventListener("click", ()=>{
-    const iso = searchDate.value;
-    if(!iso) return toast("Pilih tanggal cari.");
-    loadByDate(iso);
-  });
-
-</script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
