@@ -5,44 +5,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>STSU Digital</title>
 <style>
-body{font-family:Arial;margin:20px;background:#f2f2f2}
-.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px}
-button{padding:8px 12px;margin:5px;border:none;border-radius:8px;cursor:pointer}
-.primary{background:#2563eb;color:white}
-.success{background:#16a34a;color:white}
-.danger{background:#dc2626;color:white}
-input{padding:8px;margin:5px;width:100%;box-sizing:border-box}
-.hidden{display:none}
+  body{font-family:system-ui,Arial;margin:18px;background:#f2f4f8;color:#0f172a}
+  .card{background:#fff;padding:16px;border-radius:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(2,6,23,.08);border:1px solid #e5e7eb}
+  h3{margin:0 0 10px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  .field{flex:1;min-width:220px}
+  label{font-size:12px;color:#64748b;display:block;margin:0 0 6px}
+  input{padding:10px 12px;width:100%;box-sizing:border-box;border:1px solid #e5e7eb;border-radius:12px;font-size:14px}
+  input:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+  button{padding:10px 12px;border:none;border-radius:12px;cursor:pointer;font-weight:700}
+  .primary{background:#2563eb;color:white}
+  .success{background:#16a34a;color:white}
+  .danger{background:#dc2626;color:white}
+  .ghost{background:#f1f5f9;color:#0f172a}
+  .hidden{display:none}
+  .pill{display:inline-block;font-size:12px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:999px;background:#f8fafc;color:#334155}
+  .muted{color:#64748b;font-size:12px}
+  .item{padding:10px 0;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;gap:10px}
+  .item:last-child{border-bottom:none}
+  .right{text-align:right}
 </style>
 </head>
 <body>
 
 <div class="card" id="loginBox">
-<h3>Login</h3>
-<input id="email" placeholder="Email">
-<input id="pass" type="password" placeholder="Password">
-<button class="primary" onclick="login()">Login</button>
-<p id="loginMsg"></p>
+  <h3>Login</h3>
+  <div class="row">
+    <div class="field">
+      <label>Email</label>
+      <input id="email" placeholder="Email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="pass" type="password" placeholder="Password">
+    </div>
+  </div>
+  <div style="margin-top:10px">
+    <button class="primary" onclick="login()">Login</button>
+    <span class="muted" id="loginMsg"></span>
+  </div>
 </div>
 
 <div class="card hidden" id="appBox">
-<h3>Buat STSU</h3>
-<input id="tanggal" type="date">
-<input id="nominal" placeholder="Nominal (angka saja)">
-<button class="success" onclick="saveData()">Simpan</button>
-<button class="danger" onclick="logout()">Logout</button>
-<p id="saveMsg"></p>
+  <div class="row" style="justify-content:space-between">
+    <div>
+      <h3 style="margin:0">Buat STSU (Sederhana)</h3>
+      <div class="muted">Tahap 2: data per-user, 10 terakhir, search tanggal, format rupiah.</div>
+    </div>
+    <div>
+      <span class="pill" id="who">-</span>
+      <button class="danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div style="height:12px"></div>
+
+  <div class="row">
+    <div class="field">
+      <label>Tanggal</label>
+      <input id="tanggal" type="date">
+    </div>
+    <div class="field">
+      <label>Nominal (otomatis titik ribuan)</label>
+      <input id="nominal" inputmode="numeric" placeholder="0">
+    </div>
+    <div class="field" style="min-width:160px;flex:0">
+      <label>&nbsp;</label>
+      <button class="success" style="width:100%" onclick="saveData()">Simpan</button>
+    </div>
+  </div>
+
+  <div class="muted" id="saveMsg" style="margin-top:10px"></div>
 </div>
 
 <div class="card hidden" id="dashBox">
-<h3>Dashboard</h3>
-<div id="list"></div>
+  <div class="row" style="justify-content:space-between">
+    <div>
+      <h3 style="margin:0">Dashboard</h3>
+      <div class="muted">Default: 10 STSU terakhir. Bisa cari berdasarkan tanggal.</div>
+    </div>
+    <div class="row">
+      <div class="field" style="min-width:220px">
+        <label>Cari tanggal</label>
+        <input id="searchDate" type="date">
+      </div>
+      <div class="field" style="min-width:160px;flex:0">
+        <label>&nbsp;</label>
+        <button class="ghost" onclick="searchByDate()">Cari</button>
+      </div>
+      <div class="field" style="min-width:160px;flex:0">
+        <label>&nbsp;</label>
+        <button class="ghost" onclick="loadLatest()">10 Terakhir</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:10px"></div>
+
+  <div class="row" style="justify-content:space-between">
+    <div>
+      <div class="muted">Jumlah</div>
+      <div style="font-size:22px;font-weight:900" id="sumCount">0</div>
+    </div>
+    <div class="right">
+      <div class="muted">Total</div>
+      <div style="font-size:22px;font-weight:900" id="sumTotal">Rp 0</div>
+    </div>
+  </div>
+
+  <div style="height:12px"></div>
+
+  <div id="list"></div>
+  <div class="muted" id="dashMsg" style="margin-top:10px"></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+import { getDatabase, ref, push, get, query, orderByChild, limitToLast, startAt, endAt } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDqIE0cumE-7RgK3XE5QIYyQLpzgl1nB8A",
@@ -58,65 +138,129 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+const $ = (id)=>document.getElementById(id);
+const fmtRp = (n)=>"Rp " + Number(n||0).toLocaleString("id-ID");
+const onlyDigits = (s)=>String(s||"").replace(/[^\d]/g,"");
+
 window.login = async function(){
+  $("loginMsg").textContent = "Memproses...";
   try{
-    await signInWithEmailAndPassword(auth,
-      document.getElementById("email").value,
-      document.getElementById("pass").value
-    );
+    await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value);
+    $("loginMsg").textContent = "";
   }catch(e){
-    document.getElementById("loginMsg").innerText = e.message;
+    $("loginMsg").textContent = e.message;
   }
 }
+window.logout = async function(){ await signOut(auth); }
 
-window.logout = async function(){
-  await signOut(auth);
+function normalizeMoneyInput(){
+  const raw = onlyDigits($("nominal").value);
+  $("nominal").value = raw ? Number(raw).toLocaleString("id-ID") : "";
 }
+$("nominal").addEventListener("input", ()=>{
+  // jangan render ulang, cuma bersihkan digit biar keyboard nggak hilang
+  const raw = onlyDigits($("nominal").value);
+  $("nominal").value = raw;
+});
+$("nominal").addEventListener("blur", normalizeMoneyInput);
+$("nominal").addEventListener("focus", ()=>{
+  $("nominal").value = onlyDigits($("nominal").value);
+});
 
 window.saveData = async function(){
-  const tgl = document.getElementById("tanggal").value;
-  const nominal = Number(document.getElementById("nominal").value || 0);
+  const u = auth.currentUser;
+  if(!u) return;
+
+  const tgl = $("tanggal").value;
+  const nominal = Number(onlyDigits($("nominal").value) || 0);
+
   if(!tgl || nominal <= 0){
-    document.getElementById("saveMsg").innerText = "Isi tanggal & nominal";
+    $("saveMsg").textContent = "Isi tanggal & nominal (lebih dari 0).";
     return;
   }
 
-  await push(ref(db,"stsu"),{
-    uid: auth.currentUser.uid,
+  // simpan per-user
+  await push(ref(db, `stsu/${u.uid}`),{
+    uid: u.uid,
     tanggal: tgl,
-    nominal: nominal,
+    ymd: tgl.replaceAll("-",""), // YYYYMMDD untuk search
+    nominal,
     createdAt: Date.now()
   });
 
-  document.getElementById("saveMsg").innerText = "Tersimpan ✅";
-  loadDashboard();
+  $("saveMsg").textContent = "Tersimpan ✅";
+  $("nominal").value = "";
+  $("tanggal").value = "";
+  await loadLatest();
+};
+
+async function renderList(arr){
+  const list = $("list");
+  list.innerHTML = "";
+
+  let sum = 0;
+  for(const d of arr) sum += Number(d.nominal||0);
+  $("sumCount").textContent = String(arr.length);
+  $("sumTotal").textContent = fmtRp(sum);
+
+  for(const d of arr){
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:900">${d.tanggal}</div>
+        <div class="muted">${new Date(d.createdAt||Date.now()).toLocaleString("id-ID")}</div>
+      </div>
+      <div class="right" style="font-weight:900">${fmtRp(d.nominal)}</div>
+    `;
+    list.appendChild(div);
+  }
 }
 
-async function loadDashboard(){
-  const snap = await get(ref(db,"stsu"));
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-  if(snap.exists()){
-    Object.values(snap.val()).forEach(d=>{
-      list.innerHTML += `
-        <div style="padding:8px;border-bottom:1px solid #ccc">
-        ${d.tanggal} - Rp ${d.nominal.toLocaleString("id-ID")}
-        </div>
-      `;
-    });
+window.loadLatest = async function(){
+  const u = auth.currentUser;
+  if(!u) return;
+
+  $("dashMsg").textContent = "Memuat 10 terakhir...";
+  const q = query(ref(db, `stsu/${u.uid}`), orderByChild("createdAt"), limitToLast(10));
+  const snap = await get(q);
+
+  const arr = snap.exists() ? Object.values(snap.val()).sort((a,b)=>b.createdAt-a.createdAt) : [];
+  await renderList(arr);
+  $("dashMsg").textContent = arr.length ? "" : "Belum ada data.";
+}
+
+window.searchByDate = async function(){
+  const u = auth.currentUser;
+  if(!u) return;
+
+  const d = $("searchDate").value;
+  if(!d){
+    $("dashMsg").textContent = "Pilih tanggal dulu.";
+    return;
   }
+  const ymd = d.replaceAll("-","");
+  $("dashMsg").textContent = "Mencari...";
+
+  const q = query(ref(db, `stsu/${u.uid}`), orderByChild("ymd"), startAt(ymd), endAt(ymd));
+  const snap = await get(q);
+
+  const arr = snap.exists() ? Object.values(snap.val()).sort((a,b)=>b.createdAt-a.createdAt).slice(0,50) : [];
+  await renderList(arr);
+  $("dashMsg").textContent = arr.length ? "" : "Tidak ada data di tanggal itu.";
 }
 
 onAuthStateChanged(auth,(user)=>{
   if(user){
-    document.getElementById("loginBox").classList.add("hidden");
-    document.getElementById("appBox").classList.remove("hidden");
-    document.getElementById("dashBox").classList.remove("hidden");
-    loadDashboard();
+    $("who").textContent = user.email || user.uid;
+    $("loginBox").classList.add("hidden");
+    $("appBox").classList.remove("hidden");
+    $("dashBox").classList.remove("hidden");
+    loadLatest();
   }else{
-    document.getElementById("loginBox").classList.remove("hidden");
-    document.getElementById("appBox").classList.add("hidden");
-    document.getElementById("dashBox").classList.add("hidden");
+    $("loginBox").classList.remove("hidden");
+    $("appBox").classList.add("hidden");
+    $("dashBox").classList.add("hidden");
   }
 });
 </script>
